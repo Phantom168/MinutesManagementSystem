@@ -1,5 +1,6 @@
 import React, { Component } from "react";
-
+import Collapsible from "react-collapsible";
+import { Placeholder } from "./updateHandbook";
 
 export function PointHistory(props) {
     return (
@@ -49,28 +50,30 @@ export function AgendaPointView(props){
 class Agenda extends Component {
     constructor(props){
         super(props);
-        this.state = {agenda:0,point:0}
+        this.state = {agenda:0,point:0,subpoint:0, editing_point:false}
         this.data = [{num:1,name:'Agenda 1',points:[
-            {num:1,changes:[
-                {when:"51st Senate Meeting",change:"SFDSFSDGDFGHFDGFDG"},
-                {when:"49st Senate Meeting",change:";lkSFsdfsdfsdfsdfsdfDG"},
-                {when:"48st Senate Meeting",change:"jkkSsdfsdfsdfsdfsdfsdfsfsdfsdfGFDG"},
-                {when:"46st Senate Meeting",change:"sdfsdfSsdfsdfdsfsdfsdfsdfDG"},
+            {num:1,name:"Ag Pt 1", has_subpoints:true, subpoints:[
+                {num:1,name:"Subpoint 1"},
+                {num:2,name:"Subpoint 2"},
+                {num:3,name:"Subpoint 3"},
             ]},
-            {num:2,changes:[
-                {when:"53st Senate Meeting",change:"sfsdSFDSFSDGDFGHFDGFDG"},
-                {when:"48st Senate Meeting",change:"QQRWasdasdasdasdasSDAFSASDFfDG"},
-                {when:"47st Senate Meeting",change:"QWRWQRSDFGSDFSDFSsdfsdfsdSDFSDFSDfsdfsdfsdfsfsdfsdfGFDG"},
-                {when:"45st Senate Meeting",change:"FDHHDFGHSsdfsdfdsfsdfsdfsdfDG"},
+            {num:1,name:"Ag Pt 2", has_subpoints:true, subpoints:[
+                {num:1,name:"Subpoint 1"},
+                {num:2,name:"Subpoint 2"},
             ]},
-            {num:3,changes:[{when:"51st Senate Meeting",change:"SFDSFSDGDFGHFDGFDG"}]},
-            {num:4,changes:[{when:"51st Senate Meeting",change:"SFDSFSDGDFGHFDGFDG"}]},
-            {num:5,changes:[{when:"51st Senate Meeting",change:"SFDSFSDGDFGHFDGFDG"}]},
+            {num:1,name:"Ag Pt 2", has_subpoints:false}
         ]},
-        {num:2,name:'Agenda 2',points:[1,2,3]},
-        {num:3,name:'Agenda 3',points:[1,2,3,4]},
-        {num:4,name:'Agenda 4',points:[1,2,3,4,5,6]},
-        {num:5,name:'Agenda 5',points:[1,2]}]
+        {num:2,name:'Agenda 2',points:[
+            {num:1,name:"Ag Pt 1", has_subpoints:true, subpoints:[
+                {num:1,name:"Subpoint 1"},
+                {num:2,name:"Subpoint 2"},
+            ]},
+            {num:1,name:"Ag Pt 2", has_subpoints:true, subpoints:[
+                {num:1,name:"Subpoint 1"},
+                {num:2,name:"Subpoint 2"},
+                {num:2,name:"Subpoint 3"},
+            ]},
+        ]},]
     }
 
     
@@ -102,7 +105,7 @@ class Agenda extends Component {
       <ul className="list-group">
             {
                 this.data.map((val) => {
-                    return <li onClick={this.handleAgendaClick} className="list-item agenda clickable" data-target={"agenda_"+val.num}>{val.name}</li>
+                    return <li data-active={this.state.agenda == val.num} onClick={this.handleAgendaClick} className="list-item agenda clickable" data-target={"agenda_"+val.num}>{val.name}</li>
                 })
             }
       </ul>
@@ -116,7 +119,19 @@ class Agenda extends Component {
                 <ul id={"agenda_"+id} className="list-group">
                     {val.points.map((det,id) => {
                         return (
-                            <li  onClick={this.handlePointClick} className="list-item agenda-point clickable" data-target={"agenda-pt_"+det.num}>Handbook Point {det.num}</li>
+                            det.has_subpoints ? 
+                            (<Collapsible trigger={det.name}>
+                                {
+                                    det.subpoints.map((sp) => {
+                                        return (
+                                            <li data-active={this.state.point == det.num}  onClick={this.handlePointClick} className="list-item agenda-point clickable" data-target={"agenda-pt_"+sp.num}>Handbook Sub Point {sp.num}</li>
+                                        )
+                                    })
+                                }
+                            </Collapsible>)
+
+                            : <li data-active={this.state.point == det.num}  onClick={this.handlePointClick} className="list-item agenda-point clickable" data-target={"agenda-pt_"+det.num}>Handbook Point {det.num}</li>
+                            
                         )
                     })}
 
@@ -128,8 +143,15 @@ class Agenda extends Component {
     </div>
 
     <div className="col-sm-6 changes-data pt-5">
-        <AgendaPointCreateForm/>
-        <AgendaPointView/>
+        {
+            this.state.agenda == 0 ? (this.state.point == 0 ?
+            <Placeholder text="agenda and point" feature="view/edit" /> :
+            <Placeholder text="point" feature="view/edit" /> ) :
+            <AgendaPointView/>
+        }
+
+        
+        
       {/* <pointHistory className="test">Hello</pointHistory> */}
       {this.data.map((val) => {
         return (

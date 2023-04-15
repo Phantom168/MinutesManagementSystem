@@ -1,4 +1,5 @@
 import { Component } from "react";
+import { Placeholder } from "./updateHandbook";
 
 
 export function PointHistory(props) {
@@ -88,14 +89,18 @@ class SenateDecisions extends Component {
       <ul className="list-group">
             {
                 this.data.map((val) => {
-                    return <li onClick={this.handleAgendaClick} className="list-item agenda clickable" data-target={"agenda_"+val.num}>{val.name}</li>
+                    return <li data-active={this.state.sen_pt == val.num} onClick={this.handleSenatePointClick} className="list-item agenda clickable" data-target={"sen_dec_pt_"+val.num}>{val.name}</li>
                 })
             }
       </ul>
     </div>
 
     <div className="col-sm-8 right-pane">
-        <this.SenateDecisionForm />
+        {
+          this.state.sen_pt != 0 ?
+          <this.SenateDecisionForm /> :
+          <Placeholder text="senate point" feature="take a decision on it" />
+        }
       {/* <pointHistory className="test">Hello</pointHistory> */}
       {this.data.map((val) => {
         return (

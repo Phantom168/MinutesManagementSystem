@@ -63,7 +63,6 @@ class Home extends Component {
         this.setState({
             point:Number(e.target.dataset.target.split("_").slice(-1))
         })
-        console.log(this.state)
     }
 
     render() {
@@ -74,13 +73,13 @@ class Home extends Component {
       <ul className="list-group">
             {
                 this.data.map((val) => {
-                    return <li onClick={this.handleAgendaClick} className="list-item section clickable" data-target={"section_"+val.num}>{val.name}</li>
+                    return <li data-active={this.state.section == val.num} onClick={this.handleAgendaClick} className="list-item section clickable" data-target={"section_"+val.num}>{val.name}</li>
                 })
             }
       </ul>
     </div>
 
-    <div className="col-sm-3 seection-submenu center-pane">
+    <div className="col-sm-3 section-submenu center-pane">
         {this.state.section !=0 && <h2>Hanbook Points</h2>}
         {this.data.map((val,id) => {
             return (
@@ -89,7 +88,7 @@ class Home extends Component {
                 <ul id={"section_"+id} className="list-group">
                     {val.points.map((det,id) => {
                         return (
-                            <li  onClick={this.handlePointClick} className="list-item section-point clickable" data-target={"section-pt_"+det.num}>Handbook Point {det.num}</li>
+                            <li data-active={this.state.point == det.num}  onClick={this.handlePointClick} className="list-item section-point clickable" data-target={"section-pt_"+det.num}>Handbook Point {det.num}</li>
                         )
                     })}
 

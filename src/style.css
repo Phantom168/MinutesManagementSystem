@@ -2,7 +2,7 @@ li{
     list-style-type: none;
 }
 
-.home-cont, .agenda-cont, .sen-dec-cont{
+.home-cont, .agenda-cont, .sen-dec-cont, .up_hb_cont{
     display:flex;
     flex-direction: row;
     height:100%;
@@ -25,6 +25,10 @@ div.left-pane, div.center-pane, div.right-pane{
     border-right: 1px black dashed;
 }
 
+h5.placeholder-tile{
+    margin:auto;
+}
+
 div.agenda-menu, div.agenda-submenu{
     /* padding-top:0; */
 }
@@ -38,6 +42,7 @@ li.clickable {
     padding:10px;
     /* padding-left:0; */
     cursor: pointer;
+    background:white;
 }
 
 li.clickable:hover {
@@ -75,16 +80,27 @@ form.sen_dec_form, form.ag_pt_create_form, form.ag_pt_view, form.up_hb_form{
     margin:auto;
 }
 
-form.sen_dec_form>div, form.up_hb_form>div, form.ag_pt_create_form>div, form.ag_pt_view>div{
+form.sen_dec_form>div, form.up_hb_form>div.boxing-div, form.ag_pt_create_form>div, form.ag_pt_view>div{
     display:flex;
     justify-content: center;
     padding: 1rem 0;
 }
 
-form.sen_dec_form .btn,form.ag_pt_create_form .btn,form.ag_pt_view .btn,form.up_hb_form>div>*{
+form.sen_dec_form .btn,form.ag_pt_create_form .btn,form.ag_pt_view .btn,form.up_hb_form>div.boxing-div>*, .up_hb_menu>div>.btn{
     margin: 0 1rem;
+}
+
+.up_hb_menu>div{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-bottom:3rem;
 }
 
 form.up_hb_form input, form.sen_dec_form input{
     margin-bottom:20px;
+}
+
+li.clickable[data-active="true"]{
+    background:lightgray;
 }

@@ -1,4 +1,9 @@
 import { Component } from "react";
+import ReactQuill from "react-quill";
+import { Editor } from "react-draft-wysiwyg";
+import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+import { EditorState, convertToRaw } from "draft-js";
+import draftToHtml from 'draftjs-to-html';
 
 
 export function PointHistory(props) {
@@ -17,6 +22,11 @@ export function AgendaTile(props){
 }
 
 
+export function Placeholder(props){
+  return (
+    <h5 className="placeholder-tile">Select {"article" in props ? props.article : "a"} {props.text} first to {props.feature}</h5>
+  )
+}
 
 
 
@@ -26,30 +36,25 @@ export function AgendaTile(props){
 class UpdateHandbook extends Component {
     constructor(props){
         super(props);
-        this.state = {section:0,point:0,sen_pt:0}
-        this.data = [{num:1,name:'Agenda 1',points:[
-            {num:1,changes:[
-                {when:"51st Senate Meeting",change:"SFDSFSDGDFGHFDGFDG"},
-                {when:"49st Senate Meeting",change:";lkSFsdfsdfsdfsdfsdfDG"},
-                {when:"48st Senate Meeting",change:"jkkSsdfsdfsdfsdfsdfsdfsfsdfsdfGFDG"},
-                {when:"46st Senate Meeting",change:"sdfsdfSsdfsdfdsfsdfsdfsdfDG"},
-            ]},
-            {num:2,changes:[
-                {when:"53st Senate Meeting",change:"sfsdSFDSFSDGDFGHFDGFDG"},
-                {when:"48st Senate Meeting",change:"QQRWasdasdasdasdasSDAFSASDFfDG"},
-                {when:"47st Senate Meeting",change:"QWRWQRSDFGSDFSDFSsdfsdfsdSDFSDFSDfsdfsdfsdfsfsdfsdfGFDG"},
-                {when:"45st Senate Meeting",change:"FDHHDFGHSsdfsdfdsfsdfsdfsdfDG"},
-            ]},
-            {num:3,changes:[{when:"51st Senate Meeting",change:"SFDSFSDGDFGHFDGFDG"}]},
-            {num:4,changes:[{when:"51st Senate Meeting",change:"SFDSFSDGDFGHFDGFDG"}]},
-            {num:5,changes:[{when:"51st Senate Meeting",change:"SFDSFSDGDFGHFDGFDG"}]},
-        ]},
-        {num:2,name:'Agenda 2',points:[1,2,3]},
-        {num:3,name:'Agenda 3',points:[1,2,3,4]},
-        {num:4,name:'Agenda 4',points:[1,2,3,4,5,6]},
-        {num:5,name:'Agenda 5',points:[1,2]}]
+        this.state = {section:0,point:0,editorState: EditorState.createEmpty(),}
+        this.data = [{num:1,name:'Senate Pt 1',points:[1,2,3]},
+        {num:2,name:'Senate Pt 2',points:[1,2,3]},
+        {num:3,name:'Senate Pt 3',points:[1,2,3,4]},
+        {num:4,name:'Senate Pt 4',points:[1,2,3,4,5,6]},
+        {num:5,name:'Senate Pt 5',points:[1,2]}]
     }
 
+
+    onEditorStateChange = (editorState) => {
+      this.setState({
+        editorState,
+      });
+      console.log(draftToHtml(convertToRaw(editorState.getCurrentContent())));
+    };
+
+    handleTextChange = (e) => {
+      console.log(e)
+    }
     
     UpdateHandbookForm = (props) => {
       return (
@@ -58,7 +63,7 @@ class UpdateHandbook extends Component {
               <input readOnly={true} type="text" class="form-control" id="up_hb_prop" placeholder="Proposal for the Senate Point"></input>
               <label for="up_hb_res" class="form-label">Resolution</label>
               <input readOnly={true} type="text" class="form-control" id="up_hb_res" placeholder="Resolution for the Senate Point"></input>
-              <div>
+              <div className="boxing-div">
               <select>
                 <option selected>Choose the Handbook Section</option>
                 {
@@ -77,12 +82,16 @@ class UpdateHandbook extends Component {
               </select>
               </div>
   
-              <textarea placeholder={
-                (this.state.section != 0 && this.state.point !=0) ? 
-                (props.hb_data[this.state.section][this.state.point]) : ("Please Select a Section and a Point")
-              }></textarea>
+                
+              <Editor
+                editorState={this.state.editorState}
+                wrapperClassName="wysiwyg-wrapper"
+                editorClassName="wysiwyg"
+                onEditorStateChange={this.onEditorStateChange}
+              />;
               
-              <div>
+              
+              <div className="boxing-div">
                   <button className="btn btn-success">Create</button>
                   <button className="btn btn-danger">Cancel</button>
               </div>
@@ -93,46 +102,56 @@ class UpdateHandbook extends Component {
    
     
 
-    handleSenatePointClick = (e) => {
+      handleSenatePointClick = (e) => {
         // console.log(e.target.dataset.target.split("_"))
         this.setState({
-            sen_pt:Number(e.target.dataset.target.split("_").slice(-1)),
-            section:0,
-            point:0
+            section:Number(e.target.dataset.target.split("_").slice(-1)),
         })
+    }
+
+    handlePreview = (e) => {
+      
+    }
+
+    handlePublish = (e) => {
+
     }
 
 
     render() {
-      return (<div className="row">
-      <div className="col-sm-4 agenda-menu left-pane pt-5 pl-5">
+      return (<div className="up_hb_cont">
+      <div className="col-sm-4 up_hb_menu left-pane">
+        <div>
+          <button onClick={this.handlePreview} className="btn btn-primary">Preview Handbook</button>
+          <button onClick={this.handlePublish} className="btn btn-primary">Publish Handbook</button>
+        </div>
       <h2>Senate Points</h2>
       <ul className="list-group">
             {
                 this.data.map((val) => {
-                    return <li onClick={this.handleAgendaClick} className="list-item agenda clickable" data-target={"agenda_"+val.num}>{val.name}</li>
+                    return <li data-active={this.state.section == val.num} onClick={this.handleSenatePointClick} className="list-item agenda clickable" data-target={"up_hb_sen_pt_"+val.num}>{val.name}</li>
                 })
             }
       </ul>
     </div>
+            
+    <div className="col-sm-8 right-pane up_hb_pane">
+          {
+            this.state.section !=0 ? <this.UpdateHandbookForm 
+            hb_data={[["fgsdgdfgfgdfgfgd","dfgdfgdfgdfgdfg","asdasddfghhkjjhg"],
+             ["fasdgsdgdfgfgdfgfgd","uiouidfgdfgdfgdfgdfg","atyutysdasddfghhkjjhg"],
+              ["utyrtyfgsdgdfgfgdfgfgd","bvnbvndfgdfgdfgdfgdfg","hjkjasdasddfghhkjjhg"]]}
+               sections={[{value:1,text:"Point 1: dfgfdgdf"},
+               {value:2,text:"Point 2: hjkdfgfdhjkhgdf"},
+               {value:3,text:"Point 3: jkkdfgfdgdf"}]} 
+               points={[{value:1,text:"Section 1: dfgfdgdf"},
+               {value:2,text:"Section 2: hjkdfgfdhjkhgdf"},
+               {value:3,text:"Section 3: jkkdfgfdgdf"}] }/>
 
-    <div className="col-sm-8 changes-data pt-5">
-        <this.UpdateHandbookForm hb_data={[["fgsdgdfgfgdfgfgd","dfgdfgdfgdfgdfg","asdasddfghhkjjhg"], ["fasdgsdgdfgfgdfgfgd","uiouidfgdfgdfgdfgdfg","atyutysdasddfghhkjjhg"], ["utyrtyfgsdgdfgfgdfgfgd","bvnbvndfgdfgdfgdfgdfg","hjkjasdasddfghhkjjhg"]]} sections={[{value:1,text:"Point 1: dfgfdgdf"},{value:2,text:"Point 2: hjkdfgfdhjkhgdf"},{value:3,text:"Point 3: jkkdfgfdgdf"}]} points={[{value:1,text:"Section 1: dfgfdgdf"},{value:2,text:"Section 2: hjkdfgfdhjkhgdf"},{value:3,text:"Section 3: jkkdfgfdgdf"}] }/>
-      {/* <pointHistory className="test">Hello</pointHistory> */}
-      {this.data.map((val) => {
-        return (
-            val.points.map((pt) => {
-                return (
-                    this.state.agenda == val.num && this.state.point == pt.num &&
-                    pt.changes.map((ch) => {
-                        return (
-                            <PointHistory when={ch.when} change={ch.change}></PointHistory>
-                        )
-                    })
-                )
-            })
-        )
-      })}
+               : <Placeholder text="senate point" feature="to edit the handbook" />
+          }
+      
+    
 
     </div>
 </div>);
