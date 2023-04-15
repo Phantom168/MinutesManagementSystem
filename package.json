@@ -2,7 +2,6 @@
   "name": "sms",
   "version": "0.1.0",
   "private": false,
-  "homepage":"https://phantom168.github.io/MinutesManagementSystem/",
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
