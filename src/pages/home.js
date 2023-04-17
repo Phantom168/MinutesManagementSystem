@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import $ from 'jquery';
-
+import { getHandbookSectionAPI, getHandbookPointsSectionIdAPI } from '../api/handbook'
+import { getSenatePointsIdAPI } from '../api/senateMeeting'
 import '../style.css';
 
 export function PointHistory(props) {
@@ -12,112 +12,139 @@ export function PointHistory(props) {
     );
 }
 
-export function AgendaTile(props){
+export function AgendaTile(props) {
     return (
-        <li onClick={props.handleAgendaClick} className="list-item section" data-target={"section"+props.num}>{props.name}</li>
+        <li onClick={props.handleAgendaClick} className="list-item section" data-target={"section" + props.num}>{props.name}</li>
     )
 }
 
+// eslint-disable-next-line no-undef
+
+
+
 class Home extends Component {
-    constructor(props){
+    constructor(props) {
         super(props);
-        this.state = {section:0,point:0}
-        this.data = [{num:1,name:'Section 1',points:[
-            {num:1,changes:[
-                {when:"51st Senate Meeting",change:"SFDSFSDGDFGHFDGFDG"},
-                {when:"49st Senate Meeting",change:";lkSFsdfsdfsdfsdfsdfDG"},
-                {when:"48st Senate Meeting",change:"jkkSsdfsdfsdfsdfsdfsdfsfsdfsdfGFDG"},
-                {when:"46st Senate Meeting",change:"sdfsdfSsdfsdfdsfsdfsdfsdfDG"},
-            ]},
-            {num:2,changes:[
-                {when:"53st Senate Meeting",change:"sfsdSFDSFSDGDFGHFDGFDG"},
-                {when:"48st Senate Meeting",change:"QQRWasdasdasdasdasSDAFSASDFfDG"},
-                {when:"47st Senate Meeting",change:"QWRWQRSDFGSDFSDFSsdfsdfsdSDFSDFSDfsdfsdfsdfsfsdfsdfGFDG"},
-                {when:"45st Senate Meeting",change:"FDHHDFGHSsdfsdfdsfsdfsdfsdfDG"},
-            ]},
-            {num:3,changes:[{when:"51st Senate Meeting",change:"SFDSFSDGDFGHFDGFDG"}]},
-            {num:4,changes:[{when:"51st Senate Meeting",change:"SFDSFSDGDFGHFDGFDG"}]},
-            {num:5,changes:[{when:"51st Senate Meeting",change:"SFDSFSDGDFGHFDGFDG"}]},
-        ]},
-        {num:2,name:'Section 2',points:[1,2,3]},
-        {num:3,name:'Section 3',points:[1,2,3,4]},
-        {num:4,name:'Section 4',points:[1,2,3,4,5,6]},
-        {num:5,name:'Section 5',points:[1,2]}]
+        this.state = { section: 0, point: 0, data: [] }
     }
 
-    
 
-   
-    
+    async componentWillMount() {
+
+        const response = await getHandbookSectionAPI();
+        const section = response.body;
+        const new_data = []
+
+        for (let i = 0; i < section.length; i++) {
+            const pointsArray = []
+            const res2 = await getHandbookPointsSectionIdAPI(section[i].number)
+            for (const points of res2.body.handbookPoints) {
+                const changes = []
+                const versionHistory = points.versionHistory;
+                if (versionHistory.length === 0) {
+                    changes.push({
+                        when: "Original Point",
+                        change: points.text
+                    })
+                }
+                for (const version of versionHistory) {
+                    const version_data = await getSenatePointsIdAPI(version);
+                    changes.push({
+                        when: `${version_data.body.senateMeeting} Senate Meeting`,
+                        change: version_data.body.handbookPointNewText
+                    })
+                }
+                pointsArray.push({
+                    num: points.number,
+                    changes: changes
+                })
+            }
+
+            new_data.push({
+                num: section[i].number,
+                name: section[i].name,
+                points: pointsArray
+
+            })
+        };
+
+        this.setState({
+            data: new_data
+        }, this.forceUpdate())
+
+
+
+
+    }
+
 
     handleAgendaClick = (e) => {
-        // console.log(e.target.dataset.target.split("_"))
         this.setState({
-            section:Number(e.target.dataset.target.split("_").slice(-1)),
-            point:0
+            section: Number(e.target.dataset.target.split("_").slice(-1)),
+            point: 0
         })
     }
 
     handlePointClick = (e) => {
-        
+
         this.setState({
-            point:Number(e.target.dataset.target.split("_").slice(-1))
+            point: Number(e.target.dataset.target.split("_").slice(-1))
         })
     }
 
     render() {
-      return (<div className="home-cont">
-      <div className="col-sm-3 agenda-menu left-pane">
-      {/* <button className="btn mb-3" data-target="create-agenda">Create New Agenda</button> */}
-      <h2>Handbook Sections</h2>
-      <ul className="list-group">
-            {
-                this.data.map((val) => {
-                    return <li data-active={this.state.section == val.num} onClick={this.handleAgendaClick} className="list-item section clickable" data-target={"section_"+val.num}>{val.name}</li>
+        return (<div className="home-cont">
+            <div className="col-sm-3 agenda-menu left-pane">
+                {/* <button className="btn mb-3" data-target="create-agenda">Create New Agenda</button> */}
+                <h2>Handbook Sections</h2>
+                <ul className="list-group">
+                    {
+                        this.state.data?.map((val) => {
+                            return <li data-active={this.state.section === val.num} onClick={this.handleAgendaClick} className="list-item section clickable" data-target={"section_" + val.num}>{val.name}</li>
+                        })
+                    }
+                </ul>
+            </div>
+
+            <div className="col-sm-3 section-submenu center-pane">
+                {this.state.section !== 0 && <h2>Hanbook Points</h2>}
+                {this.state.data?.map((val, id) => {
+                    return (
+
+                        this.state.section === val.num &&
+                        <ul id={"section_" + id} className="list-group">
+                            {val.points?.map((det, id) => {
+                                return (
+                                    <li data-active={this.state.point === det.num} onClick={this.handlePointClick} className="list-item section-point clickable" data-target={"section-pt_" + det.num}>Handbook Point {det.num}</li>
+                                )
+                            })}
+
+                        </ul>)
                 })
-            }
-      </ul>
-    </div>
+                }
 
-    <div className="col-sm-3 section-submenu center-pane">
-        {this.state.section !=0 && <h2>Hanbook Points</h2>}
-        {this.data.map((val,id) => {
-            return (
-                
-                this.state.section == val.num && 
-                <ul id={"section_"+id} className="list-group">
-                    {val.points.map((det,id) => {
-                        return (
-                            <li data-active={this.state.point == det.num}  onClick={this.handlePointClick} className="list-item section-point clickable" data-target={"section-pt_"+det.num}>Handbook Point {det.num}</li>
-                        )
-                    })}
+            </div>
 
-                </ul>)
-        })
-        }
+            <div className="col-sm-6 changes-data">
+                {/* <pointHistory className="test">Hello</pointHistory> */}
+                {this.state.section !== 0 && this.state.point !== 0 && <h2>Version History</h2>}
+                {this.state.data?.map((val) => {
+                    return (
+                        val.points?.map((pt) => {
+                            return (
+                                this.state.section === val.num && this.state.point === pt.num &&
+                                pt.changes?.map((ch) => {
+                                    return (
+                                        <PointHistory when={ch.when} change={ch.change}></PointHistory>
+                                    )
+                                })
+                            )
+                        })
+                    )
+                })}
 
-    </div>
-
-    <div className="col-sm-6 changes-data">
-      {/* <pointHistory className="test">Hello</pointHistory> */}
-        {this.state.section !=0 && this.state.point != 0 && <h2>Version History</h2>}
-      {this.data.map((val) => {
-        return (
-            val.points.map((pt) => {
-                return (
-                    this.state.section == val.num && this.state.point == pt.num &&
-                    pt.changes.map((ch) => {
-                        return (
-                            <PointHistory when={ch.when} change={ch.change}></PointHistory>
-                        )
-                    })
-                )
-            })
-        )
-      })}
-
-    </div>
-</div>);
+            </div>
+        </div>);
     }
-  }
-  export default Home;
+}
+export default Home;
