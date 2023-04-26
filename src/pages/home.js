@@ -107,7 +107,7 @@ class Home extends Component {
             </div>
 
             <div className="col-sm-3 section-submenu center-pane">
-                {this.state.section !== 0 && <h2>Hanbook Points</h2>}
+                {this.state.section !== 0 && <h2>Handbook Points</h2>}
                 {this.state.data?.map((val, id) => {
                     return (
 

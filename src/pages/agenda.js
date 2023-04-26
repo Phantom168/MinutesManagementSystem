@@ -1,6 +1,10 @@
 import React, { Component } from "react";
 import Collapsible from "react-collapsible";
 import { Placeholder } from "./updateHandbook";
+import Button from 'react-bootstrap/Button';
+import DropdownButton from 'react-bootstrap/DropdownButton';
+import Dropdown from 'react-bootstrap/Dropdown';
+import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import { getSenateMeetingAllAPI, getSenatePointsAllAPI, getSenatePointsIdAPI, getSenatePointsMeetingIdAPI, addSenateMeetingAPI, addSenatePointAPI, } from '../api/senateMeeting'
 
 export function PointHistory(props) {
@@ -26,8 +30,8 @@ export function AgendaPointCreateForm(props) {
         <label for="ag_pt_new_prop" class="form-label">Proposal</label>
         <input type="number" class="form-control" id="ag_pt_new_prop" placeholder="Enter point number" onChange={props.handleChangenumber}></input>
 
-        <input type="text" class="form-control" id="ag_pt_new_prop" placeholder="Proposal for the Agenda Point" onChange={props.handleChangeProposal}></input>
-        <input type="text" class="form-control" id="ag_pt_new_prop" placeholder="Resolution for the Agenda Point" onChange={props.handleChangeresolution}></input>
+        <textarea type="text" class="form-control" id="ag_pt_new_prop" placeholder="Proposal for the Agenda Point" onChange={props.handleChangeProposal}></textarea>
+        {/* <input type="text" class="form-control" id="ag_pt_new_prop" placeholder="Resolution for the Agenda Point" onChange={props.handleChangeresolution}></input> */}
 
         <div>
             <button className="btn btn-success" onClick={props.handleClickCreate}>Create</button>
@@ -148,11 +152,41 @@ class Agenda extends Component {
         })
     }
 
+    handleDeleteClick = (e) =>{
+
+    }
+
+    handleRenameClick = (e) =>{
+        
+    }
+
+    handleFinaliseClick = (e) =>{
+        
+    }
+
+    handleActionClick = (e) => {
+        if(e==1){
+            this.handleClickCancel()
+        }else if(e==1){
+            this.handleRenameClick()
+        }else{
+            this.handleFinaliseClick();
+        }
+    }
+
     handlePointClick = (e) => {
 
         this.setState({
             point: Number(e.target.dataset.target.split("_").slice(-1))
         })
+    }
+
+    handleDeleteAgenda = (e) => {
+        
+    }
+
+    handleFinaliseAgenda = (e) => {
+
     }
 
 
@@ -173,6 +207,7 @@ class Agenda extends Component {
         window.location.reload(false);
 
     }
+
 
     handleClickCancel = () => {
         this.setState({ newpoint: 0 })
@@ -197,7 +232,17 @@ class Agenda extends Component {
             </div>
 
             <div className="col-sm-3 agenda-submenu center-pane">
-                {this.state.agenda !== 0 && <React.Fragment> <button className="btn mb-3" data-target="create-agenda" onClick={this.handlenewpoint}>New Agenda Point</button> <h2>Agenda Points</h2></React.Fragment>}
+                {this.state.agenda !== 0 && <React.Fragment> 
+                    <DropdownButton onSelect={(e) => console.log(e)} as={ButtonGroup} title="Dropdown" id="bg-nested-dropdown">
+                        <Dropdown.Item eventKey="1">Delete Selected Agenda</Dropdown.Item>
+                        <Dropdown.Item eventKey="2">Finalise Agenda for Senate</Dropdown.Item>
+                        <Dropdown.Item eventKey="3">Rename Selected Agenda</Dropdown.Item>
+                    </DropdownButton>
+                    
+                    <button className="btn mb-3" data-target="create-agenda" onClick={this.handlenewpoint}>New Agenda Point</button> 
+                {/* <button className="btn mb-3" data-target="create-agenda" onClick={this.handleDeleteAgenda}>Delete Selected Agenda</button>  */}
+                {/* <button className="btn mb-3" data-target="create-agenda" onClick={this.handleFinaliseAgenda}>Finalise Agenda for Senate</button> */}
+                <h2>Agenda Points</h2></React.Fragment>}
                 {this.state.data.map((val, id) => {
                     return (
                         this.state.agenda === val.num &&
