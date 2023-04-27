@@ -49,6 +49,7 @@ export function AgendaPointView(props) {
             <label for="ag_pt_view_prop" class="form-label">Proposal</label>
             <input readOnly={true} type="text" class="form-control" id="ag_pt_view_prop" placeholder={props.name} ></input>
             <input readOnly={true} type="text" class="form-control" id="ag_pt_view_prop" placeholder={props.resolution}></input>
+            <button className="btn btn-danger">Delete Point</button>
             {/*             
             <div>
                 <button className="btn btn-success">Add Subpoint</button>
@@ -233,15 +234,17 @@ class Agenda extends Component {
 
             <div className="col-sm-3 agenda-submenu center-pane">
                 {this.state.agenda !== 0 && <React.Fragment> 
-                    <DropdownButton onSelect={(e) => console.log(e)} as={ButtonGroup} title="Dropdown" id="bg-nested-dropdown">
+                    {/* <DropdownButton onSelect={(e) => console.log(e)} as={ButtonGroup} title="Dropdown" id="bg-nested-dropdown">
                         <Dropdown.Item eventKey="1">Delete Selected Agenda</Dropdown.Item>
                         <Dropdown.Item eventKey="2">Finalise Agenda for Senate</Dropdown.Item>
                         <Dropdown.Item eventKey="3">Rename Selected Agenda</Dropdown.Item>
-                    </DropdownButton>
+                    </DropdownButton> */}
                     
-                    <button className="btn mb-3" data-target="create-agenda" onClick={this.handlenewpoint}>New Agenda Point</button> 
-                {/* <button className="btn mb-3" data-target="create-agenda" onClick={this.handleDeleteAgenda}>Delete Selected Agenda</button>  */}
-                {/* <button className="btn mb-3" data-target="create-agenda" onClick={this.handleFinaliseAgenda}>Finalise Agenda for Senate</button> */}
+                    <button className="btn btn-primary mb-3" data-target="create-agenda" onClick={this.handlenewpoint}>New Agenda Point</button> 
+                <div className="btn-group">
+                    <button className="btn btn-danger mb-3" data-target="create-agenda" onClick={this.handleDeleteAgenda}>Delete Agenda</button> 
+                    <button className="btn btn-success mb-3" data-target="create-agenda" onClick={this.handleFinaliseAgenda}>Finalise Agenda</button>
+                </div>
                 <h2>Agenda Points</h2></React.Fragment>}
                 {this.state.data.map((val, id) => {
                     return (

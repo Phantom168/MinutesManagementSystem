@@ -104,3 +104,14 @@ form.up_hb_form input, form.sen_dec_form input{
 li.clickable[data-active="true"]{
     background:lightgray;
 }
+
+.agenda-submenu .btn-group, .senate-submenu .btn-group{
+    display: flex;
+    justify-content: space-between;
+}
+
+.home-right-pane .btn-container{
+    width:75%;
+    margin: auto;
+    margin-bottom:1rem;
+}

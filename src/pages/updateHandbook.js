@@ -1,9 +1,10 @@
-import { Component } from "react";
+import React, { Component } from "react";
 import ReactQuill from "react-quill";
 import { Editor } from "react-draft-wysiwyg";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import { EditorState, convertToRaw } from "draft-js";
 import draftToHtml from 'draftjs-to-html';
+import Collapsible from "react-collapsible";
 
 
 export function PointHistory(props) {
@@ -36,12 +37,29 @@ export function Placeholder(props){
 class UpdateHandbook extends Component {
     constructor(props){
         super(props);
-        this.state = {section:0,point:0,editorState: EditorState.createEmpty(),}
-        this.data = [{num:1,name:'Senate Pt 1',points:[1,2,3]},
-        {num:2,name:'Senate Pt 2',points:[1,2,3]},
-        {num:3,name:'Senate Pt 3',points:[1,2,3,4]},
-        {num:4,name:'Senate Pt 4',points:[1,2,3,4,5,6]},
-        {num:5,name:'Senate Pt 5',points:[1,2]}]
+        this.state = {senate:0,point:0,editorState: EditorState.createEmpty(),}
+        this.data = [{num:3,name:'Agenda 5',points:[
+          {num:1,name:"Ag Pt 1", has_subpoints:true, subpoints:[
+              {num:1,name:"Subpoint 1"},
+              {num:2,name:"Subpoint 2"},
+              {num:3,name:"Subpoint 3"},
+          ]},
+          {num:1,name:"Ag Pt 2", has_subpoints:true, subpoints:[
+
+          ]},
+          {num:1,name:"Ag Pt 2", has_subpoints:false}
+      ]},
+      {num:2,name:'Agenda 2',points:[
+          {num:1,name:"Ag Pt 1", has_subpoints:true, subpoints:[
+              {num:1,name:"Subpoint 1"},
+              {num:2,name:"Subpoint 2"},
+          ]},
+          {num:1,name:"Ag Pt 2", has_subpoints:true, subpoints:[
+              {num:1,name:"Subpoint 1"},
+              {num:2,name:"Subpoint 2"},
+              {num:2,name:"Subpoint 3"},
+          ]},
+      ]},]
     }
 
 
@@ -88,7 +106,7 @@ class UpdateHandbook extends Component {
                 wrapperClassName="wysiwyg-wrapper"
                 editorClassName="wysiwyg"
                 onEditorStateChange={this.onEditorStateChange}
-              />;
+              />
               
               
               <div className="boxing-div">
@@ -100,12 +118,17 @@ class UpdateHandbook extends Component {
   }
 
    
-    
+      handleSenateClick = (e) => {
+        this.setState({
+            senate: Number(e.target.dataset.target.split("_").slice(-1)),
+            point: 0
+        })
+    }
 
       handleSenatePointClick = (e) => {
         // console.log(e.target.dataset.target.split("_"))
         this.setState({
-            section:Number(e.target.dataset.target.split("_").slice(-1)),
+            point:Number(e.target.dataset.target.split("_").slice(-1)),
         })
     }
 
@@ -120,22 +143,62 @@ class UpdateHandbook extends Component {
 
     render() {
       return (<div className="up_hb_cont">
-      <div className="col-sm-4 up_hb_menu left-pane">
+      <div className="col-sm-3 up_hb_menu left-pane">
         <div>
           <button onClick={this.handlePreview} className="btn btn-primary">Preview Handbook</button>
           <button onClick={this.handlePublish} className="btn btn-primary">Publish Handbook</button>
         </div>
-      <h2>Senate Points</h2>
+      <h2>Senate Decisions</h2>
       <ul className="list-group">
             {
                 this.data.map((val) => {
-                    return <li data-active={this.state.section == val.num} onClick={this.handleSenatePointClick} className="list-item agenda clickable" data-target={"up_hb_sen_pt_"+val.num}>{val.name}</li>
+                    return <li data-active={this.state.senate == val.num} onClick={this.handleSenateClick} className="list-item agenda clickable" data-target={"up_hb_sen_pt_"+val.num}>{val.name}</li>
                 })
             }
       </ul>
     </div>
+
+    <div className="col-sm-3 up_hb-submenu center-pane">
+                {this.state.senate !== 0 && <React.Fragment> 
+                    {/* <DropdownButton onSelect={(e) => console.log(e)} as={ButtonGroup} title="Dropdown" id="bg-nested-dropdown">
+                        <Dropdown.Item eventKey="1">Delete Selected Agenda</Dropdown.Item>
+                        <Dropdown.Item eventKey="2">Finalise Agenda for Senate</Dropdown.Item>
+                        <Dropdown.Item eventKey="3">Rename Selected Agenda</Dropdown.Item>
+                    </DropdownButton> */}
+                    {/* <button className="btn mb-3" data-target="create-agenda" onClick={this.handlenewpoint}>New Agenda Point</button>  */}
+                        <button className="btn btn-warning mb-3" data-target="create-agenda" onClick={this.handleDeleteAgenda}>Unfinalise Agenda</button> 
+                        
+                     <h2>Dcision Points</h2></React.Fragment>}
+                {this.data.map((val, id) => {
+                    return (
+                        this.state.senate === val.num &&
+                        <ul id={"agenda_" + id} className="list-group">
+                            {val.points.map((det, id) => {
+                                return (
+                                    det.has_subpoints ?
+                                        (<Collapsible trigger={det.name}>
+                                            {
+                                                det.subpoints.map((sp) => {
+                                                    return (
+                                                        <li data-active={this.state.point === det.num} onClick={this.handlePointClick} className="list-item agenda-point clickable" data-target={"agenda-pt_" + sp.num}>Handbook Sub Point {sp.num}</li>
+                                                    )
+                                                })
+                                            }
+                                        </Collapsible>)
+
+                                        : <li data-active={this.state.point === det.num} onClick={this.handlePointClick} className="list-item agenda-point clickable" data-target={"agenda-pt_" + det.num}>{det.name}</li>
+
+                                )
+                            })}
+
+                        </ul>
+                    )
+                })
+                }
+
+            </div>
             
-    <div className="col-sm-8 right-pane up_hb_pane">
+    <div className="col-sm-6 right-pane up_hb_pane">
           {
             this.state.section !=0 ? <this.UpdateHandbookForm 
             hb_data={[["fgsdgdfgfgdfgfgd","dfgdfgdfgdfgdfg","asdasddfghhkjjhg"],

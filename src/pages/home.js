@@ -107,7 +107,10 @@ class Home extends Component {
             </div>
 
             <div className="col-sm-3 section-submenu center-pane">
-                {this.state.section !== 0 && <h2>Handbook Points</h2>}
+                {this.state.section !== 0 && <React.Fragment> 
+                    <button className="btn btn-danger">Delete Selected Section</button> 
+                    <h2>Handbook Points</h2>
+                    </React.Fragment>}
                 {this.state.data?.map((val, id) => {
                     return (
 
@@ -125,9 +128,14 @@ class Home extends Component {
 
             </div>
 
-            <div className="col-sm-6 changes-data">
+            <div className="col-sm-6 home-right-pane changes-data">
                 {/* <pointHistory className="test">Hello</pointHistory> */}
-                {this.state.section !== 0 && this.state.point !== 0 && <h2>Version History</h2>}
+                {this.state.section !== 0 && this.state.point !== 0 && <React.Fragment>
+                    <div className="btn-container">
+                        <button className="btn btn-danger">Delete Selected Point</button>
+                    </div>
+                    <h2>Version History</h2>
+                </React.Fragment>}
                 {this.state.data?.map((val) => {
                     return (
                         val.points?.map((pt) => {

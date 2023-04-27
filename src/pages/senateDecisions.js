@@ -91,7 +91,8 @@ class SenateDecisions extends Component {
               {/* <textarea placeholder="Comments"></textarea> */}
               <div>
                   <button className="btn btn-success">Approve</button>
-                  <button className="btn btn-danger">Reject</button>
+                  <button className="btn btn-warning">Reject</button>
+                  <button className="btn btn-danger">Delete Point</button>
               </div>
           </form>
       )
@@ -138,13 +139,18 @@ class SenateDecisions extends Component {
       </ul>
     </div>
 
-    <div className="col-sm-3 agenda-submenu center-pane">
+    <div className="col-sm-3 senate-submenu center-pane">
                 {this.state.senate !== 0 && <React.Fragment> 
-                    <DropdownButton onSelect={(e) => console.log(e)} as={ButtonGroup} title="Dropdown" id="bg-nested-dropdown">
+                    {/* <DropdownButton onSelect={(e) => console.log(e)} as={ButtonGroup} title="Dropdown" id="bg-nested-dropdown">
                         <Dropdown.Item eventKey="1">Delete Selected Agenda</Dropdown.Item>
                         <Dropdown.Item eventKey="2">Finalise Agenda for Senate</Dropdown.Item>
                         <Dropdown.Item eventKey="3">Rename Selected Agenda</Dropdown.Item>
-                    </DropdownButton>
+                    </DropdownButton> */}
+                    {/* <button className="btn mb-3" data-target="create-agenda" onClick={this.handlenewpoint}>New Agenda Point</button>  */}
+                    <div className="btn-group">
+                        <button className="btn btn-warning mb-3" data-target="create-agenda" onClick={this.handleDeleteAgenda}>Unfinalise Agenda</button> 
+                        <button className="btn btn-success mb-3" data-target="create-agenda" onClick={this.handleFinaliseAgenda}>Finalise Agenda</button>
+                    </div>
                      <h2>Agenda Points</h2></React.Fragment>}
                 {this.data.map((val, id) => {
                     return (
