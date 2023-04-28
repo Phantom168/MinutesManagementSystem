@@ -1,6 +1,11 @@
 import Home from "./pages/home";
-import Agenda from "./pages/agenda";
-import SenateDecisions from "./pages/senateDecisions";
+// import Agenda from "./pages/agenda";
+// import SenateDecisions from "./pages/senateDecisions";
+// import UpdateHandbook from "./pages/updateHandbook";
+
+import Agenda from "./pages/agenda2";
+import SenateDecisions from "./pages/senateDecisions2";
+
 import UpdateHandbook from "./pages/updateHandbook";
 import { Routes, Route, Outlet, Link } from "react-router-dom";
 

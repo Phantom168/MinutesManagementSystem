@@ -166,13 +166,7 @@ class Agenda extends Component {
     }
 
     handleActionClick = (e) => {
-        if(e==1){
-            this.handleClickCancel()
-        }else if(e==1){
-            this.handleRenameClick()
-        }else{
-            this.handleFinaliseClick();
-        }
+
     }
 
     handlePointClick = (e) => {
