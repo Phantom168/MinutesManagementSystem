@@ -1,223 +1,363 @@
-import React, { Component } from "react";
-import ReactQuill from "react-quill";
+import React, { useEffect, useState } from "react";
+import Collapsible from "react-collapsible";
 import { Editor } from "react-draft-wysiwyg";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import { EditorState, convertToRaw } from "draft-js";
 import draftToHtml from 'draftjs-to-html';
-import Collapsible from "react-collapsible";
+import { getHandbookSectionAPI, getHandbookPointsSectionIdAPI } from '../api/handbook'
+import {publishHandbookAPI, updateHandbookPointAPI} from '../api/UpdateHandbook'
+
+import { getSenateMeetingAllAPI, getSenatePointsMeetingIdAPI } from '../api/senateMeeting'
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import TextField from '@mui/material/TextField';
+
+import Select from '@mui/material/Select';
 
 
-export function PointHistory(props) {
-    return (
-        <div className="point_history_tile">
-            <h5>Change in: {props.when}</h5>
-            <p>Modification: {props.change}</p>
-        </div>
-    );
+
+const UpdateHandbook = () => {
+    const [data, setdata] = useState();
+    const [agenda, setagenda] = useState(0);
+    const [point, setpoint] = useState(0);
+    const [handbookSection, sethandbookSection] = useState();
+    const [handbookPoint, sethandbookPoint] = useState();
+    const [HandbookData, setHandbookData] = useState();
+    const [pointData, setpointData] = useState();
+    const [editorState, seteditorState] = useState(EditorState.createEmpty());
+    const [HandbookPublished, setHandbookPublished] = useState(false);
+    const [emptyHandbookPoint, setemptyHandbookPoint] = useState(false);
+    const [HandbookPointUpdated, setHandbookPointUpdated] = useState(false);
+    const [HandbooknewText, setHandbooknewText] = useState(false);
+
+const handleSubmit = async(e) => {
+    e.preventDefault();
+    const htmlContent = draftToHtml(convertToRaw(editorState.getCurrentContent()))
+    console.log(pointData.id, pointData.num, pointData.senateMeeting, handbookPoint, htmlContent, convertToRaw(editorState.getCurrentContent()))
+
+
+    !handbookPoint ? setemptyHandbookPoint(true) : (!editorState ?  setHandbooknewText(true) : await updateHandbookPointAPI(pointData.id, pointData.num, pointData.senateMeeting, handbookPoint, htmlContent))
+    if(handbookPoint && editorState)
+    {
+        setHandbookPointUpdated(true);
+        setpoint(0);
+        seteditorState(EditorState.createEmpty());
+        sethandbookSection();
+
+
+
+    }
+
 }
 
-export function AgendaTile(props){
-    return (
-        <li onClick={props.handleAgendaClick} className="list-item agenda" data-target={"agenda"+props.num}>{props.name}</li>
-    )
-}
 
+const handlePublish = async(e) => {
+    e.preventDefault();
 
-export function Placeholder(props){
-  return (
-    <h5 className="placeholder-tile">Select {"article" in props ? props.article : "a"} {props.text} first to {props.feature}</h5>
-  )
+    await publishHandbookAPI(pointData.senateMeeting);
+    setHandbookPublished(true);
+
 }
 
 
 
-// export function
 
-
-class UpdateHandbook extends Component {
-    constructor(props){
-        super(props);
-        this.state = {senate:0,point:0,editorState: EditorState.createEmpty(),}
-        this.data = [{num:3,name:'Agenda 5',points:[
-          {num:1,name:"Ag Pt 1", has_subpoints:true, subpoints:[
-              {num:1,name:"Subpoint 1"},
-              {num:2,name:"Subpoint 2"},
-              {num:3,name:"Subpoint 3"},
-          ]},
-          {num:1,name:"Ag Pt 2", has_subpoints:true, subpoints:[
-
-          ]},
-          {num:1,name:"Ag Pt 2", has_subpoints:false}
-      ]},
-      {num:2,name:'Agenda 2',points:[
-          {num:1,name:"Ag Pt 1", has_subpoints:true, subpoints:[
-              {num:1,name:"Subpoint 1"},
-              {num:2,name:"Subpoint 2"},
-          ]},
-          {num:1,name:"Ag Pt 2", has_subpoints:true, subpoints:[
-              {num:1,name:"Subpoint 1"},
-              {num:2,name:"Subpoint 2"},
-              {num:2,name:"Subpoint 3"},
-          ]},
-      ]},]
+    const handleAgendaClick = (e) => {
+        setagenda(Number(e.target.dataset.target.split("_").slice(-1)));
+        setpoint(0);
     }
 
 
-    onEditorStateChange = (editorState) => {
-      this.setState({
-        editorState,
-      });
-      console.log(draftToHtml(convertToRaw(editorState.getCurrentContent())));
-    };
 
-    handleTextChange = (e) => {
-      console.log(e)
-    }
-    
-    UpdateHandbookForm = (props) => {
-      return (
-          <form className="up_hb_form">
-              <label for="up_hb_prop" class="form-label">Proposal</label>
-              <input readOnly={true} type="text" class="form-control" id="up_hb_prop" placeholder="Proposal for the Senate Point"></input>
-              <label for="up_hb_res" class="form-label">Resolution</label>
-              <input readOnly={true} type="text" class="form-control" id="up_hb_res" placeholder="Resolution for the Senate Point"></input>
-              <div className="boxing-div">
-              <select>
-                <option selected>Choose the Handbook Section</option>
-                {
-                  props.sections.map((val) => {
-                    return <option value={val.value}>{val.text}</option>
-                  })
-                }
-              </select>
-              <select>
-                <option selected>Choose the Handbook Point</option>
-                {
-                  props.points.map((val) => {
-                    return <option value={val.value}>{val.text}</option>
-                  })
-                }
-              </select>
-              </div>
-  
-                
-              <Editor
-                editorState={this.state.editorState}
-                wrapperClassName="wysiwyg-wrapper"
-                editorClassName="wysiwyg"
-                onEditorStateChange={this.onEditorStateChange}
-              />
-              
-              
-              <div className="boxing-div">
-                  <button className="btn btn-success">Create</button>
-                  <button className="btn btn-danger">Cancel</button>
-              </div>
-          </form>
-      )
-  }
+    const getdata = async () => {
+        const response = await getSenateMeetingAllAPI();
+        const Meeting = response.body;
+        const new_data = []
 
-   
-      handleSenateClick = (e) => {
-        this.setState({
-            senate: Number(e.target.dataset.target.split("_").slice(-1)),
-            point: 0
-        })
-    }
+        for (let i = 0; i < Meeting.length; i++) {
+            const pointsArray = []
+            const res2 = await getSenatePointsMeetingIdAPI(Meeting[i].number)
+            for (const points of res2.body.senatePoints) {
 
-      handleSenatePointClick = (e) => {
-        // console.log(e.target.dataset.target.split("_"))
-        this.setState({
-            point:Number(e.target.dataset.target.split("_").slice(-1)),
-        })
-    }
-
-    handlePreview = (e) => {
-      
-    }
-
-    handlePublish = (e) => {
-
-    }
-
-
-    render() {
-      return (<div className="up_hb_cont">
-      <div className="col-sm-3 up_hb_menu left-pane">
-        <div>
-          <button onClick={this.handlePreview} className="btn btn-primary">Preview Handbook</button>
-          <button onClick={this.handlePublish} className="btn btn-primary">Publish Handbook</button>
-        </div>
-      <h2>Senate Decisions</h2>
-      <ul className="list-group">
-            {
-                this.data.map((val) => {
-                    return <li data-active={this.state.senate == val.num} onClick={this.handleSenateClick} className="list-item agenda clickable" data-target={"up_hb_sen_pt_"+val.num}>{val.name}</li>
+                pointsArray.push({
+                    id: points.id,
+                    num: points.number,
+                    name: points.name,
+                    senateMeeting: points.senateMeeting,
+                    proposal: points.proposal,
+                    resolution: points.resolution,
                 })
             }
-      </ul>
-    </div>
 
-    <div className="col-sm-3 up_hb-submenu center-pane">
-                {this.state.senate !== 0 && <React.Fragment> 
-                    {/* <DropdownButton onSelect={(e) => console.log(e)} as={ButtonGroup} title="Dropdown" id="bg-nested-dropdown">
+            new_data.push({
+                num: Meeting[i].number,
+                name: Meeting[i].announcement,
+                points: pointsArray
+
+            })
+        };
+        setdata(new_data)
+
+        const newhandbookData = [];
+        const handbookResponse = await getHandbookSectionAPI();
+        const section = handbookResponse.body;
+
+        for (let i = 0; i < section.length; i++) {
+
+            const handbookPointsArray = []
+            const handbookRes2 = await getHandbookPointsSectionIdAPI(section[i].number)
+            for (const points of handbookRes2.body.handbookPoints) {
+
+                handbookPointsArray.push({
+                    id : points.id,
+                    text : points.text, 
+                    num: points.number,
+                })
+            }
+
+            newhandbookData.push({
+                name : section[i].name,
+                points : handbookPointsArray
+            })
+        }
+
+        console.log("newhandbookData", newhandbookData)
+        setdata(new_data);
+        setHandbookData(newhandbookData)
+
+
+    }
+
+
+
+    useEffect(() => {
+        getdata();
+    }, [])
+
+    return (
+        <>
+
+<Snackbar open={HandbooknewText} autoHideDuration={3000} onClose={() => { setHandbooknewText(false); }}>
+                <Alert onClose={() => { setHandbooknewText(false); }} severity="error" sx={{ width: '100%' }}>
+                    Please Write HandbookPoint to be updated!
+                </Alert>
+            </Snackbar>
+
+
+            <Snackbar open={emptyHandbookPoint} autoHideDuration={3000} onClose={() => { setemptyHandbookPoint(false); }}>
+                <Alert onClose={() => { setemptyHandbookPoint(false); }} severity="error" sx={{ width: '100%' }}>
+                    Please Select HandbookPoint to be updated!
+                </Alert>
+            </Snackbar>
+
+            <Snackbar open={HandbookPointUpdated} autoHideDuration={3000} onClose={() => { setHandbookPointUpdated(false); }}>
+                <Alert onClose={() => { setHandbookPointUpdated(false); }} severity="success" sx={{ width: '100%' }}>
+                    Handbook point Added. Please Publish the Changes.
+                </Alert>
+            </Snackbar>
+
+            <Snackbar open={HandbookPublished} autoHideDuration={3000} onClose={() => { setHandbookPublished(false); }}>
+                <Alert onClose={() => { setHandbookPublished(false); }} severity="success" sx={{ width: '100%' }}>
+                    Handbook changes are published.
+                </Alert>
+            </Snackbar>
+
+
+            <div className="agenda-cont">
+                <div className="col-sm-3 agenda-menu left-pane">
+                    <button className="btn btn-primary">Preview Handbook</button>
+                    <button className="btn btn-primary" onClick={handlePublish}>Publish Handbook</button>
+                    <h2>Senate Decisions</h2>
+                    <ul className="list-group">
+                        {
+                            data?.map((val) => {
+                                return <li data-active={agenda === val.num} onClick={handleAgendaClick} className="list-item agenda clickable" data-target={"agenda_" + val.num}>{val.name}</li>
+                            })
+                        }
+                    </ul>
+                </div>
+
+
+
+                <div className="col-sm-3 agenda-submenu center-pane">
+                    {agenda !== 0 && <React.Fragment>
+                        {/* <DropdownButton onSelect={(e) => console.log(e)} as={ButtonGroup} title="Dropdown" id="bg-nested-dropdown">
                         <Dropdown.Item eventKey="1">Delete Selected Agenda</Dropdown.Item>
                         <Dropdown.Item eventKey="2">Finalise Agenda for Senate</Dropdown.Item>
                         <Dropdown.Item eventKey="3">Rename Selected Agenda</Dropdown.Item>
                     </DropdownButton> */}
-                    {/* <button className="btn mb-3" data-target="create-agenda" onClick={this.handlenewpoint}>New Agenda Point</button>  */}
-                        <button className="btn btn-warning mb-3" data-target="create-agenda" onClick={this.handleDeleteAgenda}>Unfinalise Agenda</button> 
-                        
-                     <h2>Dcision Points</h2></React.Fragment>}
-                {this.data.map((val, id) => {
-                    return (
-                        this.state.senate === val.num &&
-                        <ul id={"agenda_" + id} className="list-group">
-                            {val.points.map((det, id) => {
-                                return (
-                                    det.has_subpoints ?
-                                        (<Collapsible trigger={det.name}>
-                                            {
-                                                det.subpoints.map((sp) => {
-                                                    return (
-                                                        <li data-active={this.state.point === det.num} onClick={this.handlePointClick} className="list-item agenda-point clickable" data-target={"agenda-pt_" + sp.num}>Handbook Sub Point {sp.num}</li>
-                                                    )
-                                                })
-                                            }
-                                        </Collapsible>)
 
-                                        : <li data-active={this.state.point === det.num} onClick={this.handlePointClick} className="list-item agenda-point clickable" data-target={"agenda-pt_" + det.num}>{det.name}</li>
+                        <h2>Agenda Points</h2></React.Fragment>}
+                    {data?.map((val, id) => {
+                        return (
+                            agenda === val.num &&
+                            <ul id={"agenda_" + id} className="list-group">
+                                {val.points.map((det, id) => {
+                                    return (
+                                        det.has_subpoints ?
+                                            (<Collapsible trigger={det.name}>
+                                                {
+                                                    det.subpoints.map((sp) => {
+                                                        return (
+                                                            <li data-active={point === det.num} onClick={this.handlePointClick} className="list-item agenda-point clickable" data-target={"agenda-pt_" + sp.num}>Handbook Sub Point {sp.num}</li>
+                                                        )
+                                                    })
+                                                }
+                                            </Collapsible>)
 
-                                )
-                            })}
+                                            : <li data-active={point === det.num} onClick={(e) => {
+                                                setpoint(Number(e.target.dataset.target.split("_").slice(-1)))
+                                                setpointData(det);
 
-                        </ul>
-                    )
-                })
-                }
+                                                console.log("agenda, point", agenda, point)
+                                                console.log("data", det)
+                                            }} className="list-item agenda-point clickable" data-target={"agenda-pt_" + det.num}>{det.name}</li>
+
+                                    )
+                                })}
+
+                            </ul>
+                        )
+                    })
+                    }
+
+                </div>
+
+
+
+
+                <div className="col-sm-6 changes-data pt-5">
+
+                    {
+                        (point === 0 ? (agenda === 0 ?
+                            <h5 className="placeholder-tile">Select senate point to edit the handbook</h5>
+                            : (
+                                <h5 className="placeholder-tile">Select senate point to edit the handbook</h5>
+                            )
+                        ) : (<div>
+
+
+                            <form className="up_hb_form">
+                            <FormControl fullWidth sx={{ margin: 0.5 }}>
+
+                                <TextField 
+                                    disabled
+                                    id="outlined-disabled"
+                                    label="Proposal"
+                                    value={pointData.proposal}
+                                /></FormControl>
+                                <FormControl fullWidth sx={{ margin: 0.5 }}>
+                                <TextField
+                                    disabled
+                                    id="outlined-disabled"
+                                    label="Resolution"
+                                    value={pointData.resolution}
+                                />
+                                </FormControl>
+                                <div className="boxing-div">
+                                
+
+
+                                    {
+                                        <FormControl sx={{ m: 0.5, minWidth: 120 }}>
+
+                                            <InputLabel id="demo-simple-select-label">Section</InputLabel>
+                                            <Select
+                                                labelId="demo-simple-select-label"
+                                                id="demo-simple-select"
+                                                value={handbookSection}
+                                                label="Section"
+                                                onChange={(e) => { sethandbookSection(e.target.value) }}
+                                            >
+                                               { HandbookData.map((det, id) => {
+                                                return (
+                                                    <MenuItem value={id+1}>{det.name}</MenuItem>
+                                                )
+                                                })}
+                                            </Select>
+                                        </FormControl>
+
+                                    }
+                                    {
+                                        handbookSection && (
+                                            <>
+                                                <FormControl sx={{ m: 1, minWidth: 120 }}>
+
+                                                    <InputLabel id="demo-simple-select-label">Point</InputLabel><Select
+                                                        labelId="demo-simple-select-label"
+                                                        id="demo-simple-select"
+                                                        value={handbookPoint}
+                                                        label="Point"
+                                                        onChange={(e) => { sethandbookPoint(e.target.value); }}
+                                                    >
+                                                        {
+                                                            HandbookData[handbookSection-1].points.map((det) => {
+                                                                return (
+                                                                    <MenuItem value={det.id}>{det.text}</MenuItem>
+                                                                )
+                                                            })
+                                                        }
+
+
+                                                    </Select>
+                                                </FormControl>
+
+
+                                            </>
+
+                                        )
+
+                                    }
+                                </div>
+
+
+                                <Editor
+                                    editorState={editorState}
+                                    wrapperClassName="wysiwyg-wrapper"
+                                    editorClassName="wysiwyg"
+                                    onEditorStateChange={(e) => {
+                                        seteditorState(e);
+                                        console.log(draftToHtml(convertToRaw(editorState.getCurrentContent())))
+                                    }}
+                                />
+
+
+                                <div className="boxing-div">
+                                    <button className="btn btn-success" onClick={handleSubmit}>Create</button>
+                                </div>
+                            </form>
+
+
+
+
+
+
+
+
+
+
+                        </div>))
+
+                    }
+
+
+
+                </div>
+
+
+
+
+
+
 
             </div>
-            
-    <div className="col-sm-6 right-pane up_hb_pane">
-          {
-            this.state.section !=0 ? <this.UpdateHandbookForm 
-            hb_data={[["fgsdgdfgfgdfgfgd","dfgdfgdfgdfgdfg","asdasddfghhkjjhg"],
-             ["fasdgsdgdfgfgdfgfgd","uiouidfgdfgdfgdfgdfg","atyutysdasddfghhkjjhg"],
-              ["utyrtyfgsdgdfgfgdfgfgd","bvnbvndfgdfgdfgdfgdfg","hjkjasdasddfghhkjjhg"]]}
-               sections={[{value:1,text:"Point 1: dfgfdgdf"},
-               {value:2,text:"Point 2: hjkdfgfdhjkhgdf"},
-               {value:3,text:"Point 3: jkkdfgfdgdf"}]} 
-               points={[{value:1,text:"Section 1: dfgfdgdf"},
-               {value:2,text:"Section 2: hjkdfgfdhjkhgdf"},
-               {value:3,text:"Section 3: jkkdfgfdgdf"}] }/>
+        </>
+    )
 
-               : <Placeholder text="senate point" feature="to edit the handbook" />
-          }
-      
-    
 
-    </div>
-</div>);
-    }
-  }
-  export default UpdateHandbook;
+}
+
+export default UpdateHandbook;

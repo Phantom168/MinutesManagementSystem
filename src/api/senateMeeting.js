@@ -111,14 +111,14 @@ const addSenateMeetingAPI = async (number, announcement) => {
 
 
 
-const addSenatePointAPI = async (number, proposal, resolution, senateMeeting) => {
+const addSenatePointAPI = async (number, name, proposal, senateMeeting) => {
     try {
         let FD = new FormData();
 
-        console.log("number", number, proposal, resolution, senateMeeting)
+        console.log("number", number, name,  proposal, senateMeeting)
         FD.append("number", number)
         FD.append("proposal", proposal)
-        FD.append("resolution", resolution)
+        FD.append("name", name)
         FD.append("senateMeeting", senateMeeting)
 
         console.log("FD", FD)
@@ -145,7 +145,45 @@ const addSenatePointAPI = async (number, proposal, resolution, senateMeeting) =>
 };
 
 
+const putSenatePointAPI = async (id, number, senateMeeting, resolution, decision) => {
+    try {
+        let FD = new FormData();
+
+        FD.append("resolution", resolution)
+        FD.append("approved", decision-1)
+        FD.append("approvalComplete", 0)
+        FD.append("number", number)
+        FD.append("senateMeeting", senateMeeting)
+
+        console.log("FD", FD)
+
+        const res = await fetch(`${API}senateMeeting/senatePoints/${id}/`, {
+            method: "PUT",
+            body: FD
+        });
+
+        if (!res.ok) {
+            throw new Error(`Failed to put senate point: ${res.status}`);
+        }
+
+        const response = {
+            status: res.status,
+            body: await res.json(),
+        };
+
+        return response;
+    } catch (error) {
+        console.log(error);
+        return { status: 500, body: { error: error.message } };
+    }
+};
 
 
 
-export {getSenateMeetingAllAPI, getSenatePointsAllAPI, getSenatePointsIdAPI, getSenatePointsMeetingIdAPI, addSenateMeetingAPI, addSenatePointAPI};
+
+
+
+
+
+
+export {getSenateMeetingAllAPI, getSenatePointsAllAPI, getSenatePointsIdAPI, getSenatePointsMeetingIdAPI, addSenateMeetingAPI, addSenatePointAPI, putSenatePointAPI};
