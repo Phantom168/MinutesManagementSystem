@@ -166,8 +166,8 @@ const handlePublish = async(e) => {
             </Snackbar>
 
 
-            <div className="agenda-cont">
-                <div className="col-sm-3 agenda-menu left-pane">
+            <div className="up_hb_cont">
+                <div className="col-sm-3 up_hb_menu left-pane">
                     <button className="btn btn-primary">Preview Handbook</button>
                     <button className="btn btn-primary" onClick={handlePublish}>Publish Handbook</button>
                     <h2>Senate Decisions</h2>
@@ -198,7 +198,7 @@ const handlePublish = async(e) => {
                                 {val.points.map((det, id) => {
                                     return (
                                         det.has_subpoints ?
-                                            (<Collapsible trigger={det.name}>
+                                            (<Collapsible trigger={det.proposal}>
                                                 {
                                                     det.subpoints.map((sp) => {
                                                         return (
@@ -214,7 +214,7 @@ const handlePublish = async(e) => {
 
                                                 console.log("agenda, point", agenda, point)
                                                 console.log("data", det)
-                                            }} className="list-item agenda-point clickable" data-target={"agenda-pt_" + det.num}>{det.name}</li>
+                                            }} className="list-item agenda-point clickable" data-target={"agenda-pt_" + det.num}>{det.proposal}</li>
 
                                     )
                                 })}

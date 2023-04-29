@@ -151,7 +151,7 @@ const SenateDecisions = () => {
                                 {val.points.map((det, id) => {
                                     return (
                                         det.has_subpoints ?
-                                            (<Collapsible trigger={det.name}>
+                                            (<Collapsible trigger={det.proposal}>
                                                 {
                                                     det.subpoints.map((sp) => {
                                                         return (
@@ -167,7 +167,7 @@ const SenateDecisions = () => {
 
                                                 console.log("agenda, point", agenda, point)
                                                 console.log("data", det)
-                                            }} className="list-item agenda-point clickable" data-target={"agenda-pt_" + det.num}>{det.name}</li>
+                                            }} className="list-item agenda-point clickable" data-target={"agenda-pt_" + det.num}>{det.proposal}</li>
 
                                     )
                                 })}
@@ -238,10 +238,10 @@ const SenateDecisions = () => {
 
                                 
 
-
+                                <button className="btn btn-success" onClick={handleSubmit}>Submit</button>
                             </form>
 
-                            <button className="btn btn-success" onClick={handleSubmit}>Submit</button>
+                            
 
                         </div>))
 

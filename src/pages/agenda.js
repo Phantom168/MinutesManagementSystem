@@ -4,7 +4,9 @@ import Collapsible from "react-collapsible";
 import { getSenateMeetingAllAPI, getSenatePointsMeetingIdAPI, addSenateMeetingAPI, addSenatePointAPI } from '../api/senateMeeting'
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
-
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button';
+import CloseButton from 'react-bootstrap/CloseButton';
 
 
 const Agenda = () => {
@@ -15,11 +17,15 @@ const Agenda = () => {
     const [NewPoint, setNewPoint] = useState(false);
     const [number, setnumber] = useState();
     const [name, setname] = useState();
+    const [show,setShow] = useState(false);
 
     const [proposal, setproposal] = useState();
     const [newpointCreated, setnewpointCreated] = useState(false);
 
 
+
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
 
 
 
@@ -105,7 +111,7 @@ const Agenda = () => {
 
             <div className="agenda-cont">
                 <div className="col-sm-3 agenda-menu left-pane">
-                    <button className="btn mb-3" data-target="create-agenda">Create New Agenda</button>
+                    <button className="btn mb-3" data-target="create-agenda" onClick={handleShow}>Create New Agenda</button>
                     <h2>Agendas</h2>
                     <ul className="list-group">
                         {
@@ -137,7 +143,7 @@ const Agenda = () => {
                                 {val.points.map((det, id) => {
                                     return (
                                         det.has_subpoints ?
-                                            (<Collapsible trigger={det.name}>
+                                            (<Collapsible trigger={det.proposal}>
                                                 {
                                                     det.subpoints.map((sp) => {
                                                         return (
@@ -152,7 +158,7 @@ const Agenda = () => {
                                                 setpointData(det);
                                                 console.log("agenda, point", agenda, point)
                                                 console.log("data", det)
-                                            }} className="list-item agenda-point clickable" data-target={"agenda-pt_" + det.num}>{det.name}</li>
+                                            }} className="list-item agenda-point clickable" data-target={"agenda-pt_" + det.num}>{det.proposal}</li>
 
                                     )
                                 })}
@@ -218,6 +224,27 @@ const Agenda = () => {
 
 
             </div>
+
+            <Modal show={show} onHide={handleClose}>
+                <Modal.Header CloseButton>
+                    <Modal.Title>Crate Agenda</Modal.Title>
+                {/* <CloseButton/> */}
+                </Modal.Header>
+                <Modal.Body>
+                    <form>
+                        <label for="cr_ag_name" class="form-label">Agenda Name</label>
+                        <input type="text" class="form-control" id="cr_ag_name" placeholder="Enter the Agenda Name"></input>
+
+                        <label for="cr_ag_ann" class="form-label">Announcement</label>
+                        <input type="textarea" active="false" class="form-control" id="cr_ag_ann" placeholder="Enter the Announcement"></input>
+                    </form>
+                </Modal.Body>
+                <Modal.Footer>
+                <Button variant="primary" onClick={handleClose}>
+                    Create
+                </Button>
+                </Modal.Footer>
+            </Modal>
         </>
     )
 
