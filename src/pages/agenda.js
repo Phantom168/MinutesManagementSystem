@@ -324,11 +324,11 @@ const Agenda = () => {
 
             </div>
 
-            <Modal show={show} onHide={handleClose}>
+            {/* <Modal show={show} onHide={handleClose}>
                 <Modal.Header CloseButton>
                     <Modal.Title>Crate Agenda</Modal.Title>
                 {/* <CloseButton/> */}
-                </Modal.Header>
+                {/* </Modal.Header>
                 <Modal.Body>
                     <form>
                         <label for="cr_ag_name" class="form-label">Agenda Name</label>
@@ -342,8 +342,8 @@ const Agenda = () => {
                 <Button variant="primary" onClick={handleClose}>
                     Create
                 </Button>
-                </Modal.Footer>
-            </Modal>
+                </Modal.Footer> */}
+            {/* </Modal> */} 
         </>
     )
 
