@@ -4,6 +4,14 @@ import Collapsible from "react-collapsible";
 import { getSenateMeetingAllAPI, getSenatePointsMeetingIdAPI, addSenateMeetingAPI, addSenatePointAPI } from '../api/senateMeeting'
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Modal from '@mui/material/Modal';
+
+import FormControl from '@mui/material/FormControl';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+
 
 
 
@@ -15,11 +23,49 @@ const Agenda = () => {
     const [NewPoint, setNewPoint] = useState(false);
     const [number, setnumber] = useState();
     const [name, setname] = useState();
-
+    const [meetingNumber, setmeetingNumber] = useState();
     const [proposal, setproposal] = useState();
     const [newpointCreated, setnewpointCreated] = useState(false);
+    const [emptyMeetingNumber, setemptyMeetingNumber] = useState(false);
+    const [meetingCreated, setmeetingCreated] = useState(false);
+    const [openModal, setopenModal] = useState(false);
+
+    const [emptyAnnoucement, setemptyAnnoucement] =useState(false)
+    const [announcement, setannouncement] = useState()
+
+    const handleModalClose = () => setopenModal(false);
+
+    const style = {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: 400,
+        bgcolor: 'background.paper',
+        border: '2px solid #000',
+        boxShadow: 24,
+        p: 4,
+    };
 
 
+    const handleMeetingSubmit = async () => {
+        console.log("heree")
+        console.log("meetingNumber", meetingNumber)
+        if (meetingNumber && announcement)
+        {
+            await addSenateMeetingAPI(meetingNumber, announcement)
+            setmeetingCreated(true);
+            handleModalClose()
+            getdata();
+        }
+        else if(!meetingNumber){
+            setemptyMeetingNumber(true);
+        }
+        else{
+            setemptyAnnoucement(true);
+        }
+
+    }
 
 
 
@@ -96,6 +142,57 @@ const Agenda = () => {
         <>
 
 
+            <Modal
+                open={openModal}
+                onClose={handleModalClose}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Box sx={style}>
+
+                    <FormControl fullWidth sx={{ margin: 1 }}>
+
+                        <TextField inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+                            label="Senate Meeting Number"
+                            id="outlined-basic" variant="outlined"
+                            onChange={(e) => setmeetingNumber(e.target.value)}
+                        />
+
+
+                    </FormControl>
+
+                    <FormControl fullWidth sx={{ margin: 1 }}>
+
+                        <TextField
+                            label="Senate Meeting Name"
+                            id="outlined-basic" variant="outlined"
+                            onChange={(e) => setannouncement(e.target.value)}
+                        />
+
+
+                    </FormControl>
+
+
+
+
+                    <Button variant="outlined" onClick={handleMeetingSubmit}>Submit</Button>
+                    <Button variant="outlined" onClick={handleModalClose}>Close</Button>
+
+                </Box>
+            </Modal>
+
+
+            <Snackbar open={emptyMeetingNumber} autoHideDuration={6000} onClose={() => { setemptyMeetingNumber(false); }}>
+                <Alert onClose={() => { setemptyMeetingNumber(false); }} severity="error" sx={{ width: '100%' }}>
+                    Meeting Number empty!
+                </Alert>
+            </Snackbar>
+            <Snackbar open={emptyAnnoucement} autoHideDuration={6000} onClose={() => { setemptyAnnoucement(false); }}>
+                <Alert onClose={() => { setemptyAnnoucement(false); }} severity="error" sx={{ width: '100%' }}>
+                    Meeting Name empty!
+                </Alert>
+            </Snackbar>
+
             <Snackbar open={newpointCreated} autoHideDuration={6000} onClose={() => { setnewpointCreated(false); }}>
                 <Alert onClose={() => { setnewpointCreated(false); }} severity="success" sx={{ width: '100%' }}>
                     New Point Created!
@@ -103,9 +200,17 @@ const Agenda = () => {
             </Snackbar>
 
 
+
+            <Snackbar open={meetingCreated} autoHideDuration={6000} onClose={() => { setmeetingCreated(false); }}>
+                <Alert onClose={() => { setmeetingCreated(false); }} severity="success" sx={{ width: '100%' }}>
+                    New Senate Agenda Created!
+                </Alert>
+            </Snackbar>
+
+
             <div className="agenda-cont">
                 <div className="col-sm-3 agenda-menu left-pane">
-                    <button className="btn mb-3" data-target="create-agenda">Create New Agenda</button>
+                    <button className="btn mb-3" data-target="create-agenda" onClick={() => setopenModal(true)}>Create New Agenda</button>
                     <h2>Agendas</h2>
                     <ul className="list-group">
                         {
