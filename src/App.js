@@ -1,16 +1,19 @@
 import Home from "./pages/home";
-
+import {useState} from 'react';
 import Agenda from "./pages/agenda";
 import SenateDecisions from "./pages/senateDecisions";
 import UpdateHandbook from "./pages/updateHandbook";
-
+import Login from "./pages/login";
 
 import { Routes, Route, Outlet, Link, NavLink } from "react-router-dom";
 
-export default function App() {
-  return (
 
-      <Routes>
+
+export default function App() {
+  const [loginStatus, setLoginStatus] = useState(false);
+  return (
+    loginStatus ? 
+      (<Routes>
         <Route path="/" element={<Layout />}>
           <Route path="home" index element={<Home />} />
           <Route path="agenda" element={<Agenda />} />
@@ -22,7 +25,8 @@ export default function App() {
                 routes for. */}
           {/* <Route path="*" element={<NoMatch />} /> */}
         </Route>
-      </Routes>
+      </Routes>) :
+      <Login/>
   );
 }
 
