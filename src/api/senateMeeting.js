@@ -87,14 +87,15 @@ const getSenatePointsMeetingIdAPI = async (senateNumber) => {
 
 const addSenateMeetingAPI = async (number, announcement) => {
     try {
+        let FD = new FormData();
+
+        FD.append("announcement", announcement)
+        FD.append("number", number)
+
+
         const res = await fetch(`${API}senateMeeting/senateMeetings/`, {
             method: "POST",
-            headers: {
-                // 'Authorization': token,
-                Accept: "application/json",
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ "number": number, "announcement" : announcement }),
+            body: FD
         });
 
         //   create a map of the status and body of the response

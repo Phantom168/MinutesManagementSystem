@@ -2,12 +2,13 @@ import React, { Component } from "react";
 import { getHandbookSectionAPI, getHandbookPointsSectionIdAPI } from '../api/handbook'
 import { getSenatePointsIdAPI } from '../api/senateMeeting'
 import '../style.css';
+var parse = require('html-react-parser');
 
 export function PointHistory(props) {
     return (
         <div className="point_history_tile">
             <h5>Change in: {props.when}</h5>
-            <p>Modification: {props.change}</p>
+           {parse(props.change)}
         </div>
     );
 }
