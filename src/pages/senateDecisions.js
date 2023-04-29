@@ -1,211 +1,267 @@
-import React, { Component } from "react";
-import { Placeholder } from "./updateHandbook";
+import React, { useEffect, useState } from "react";
 import Collapsible from "react-collapsible";
-import Button from 'react-bootstrap/Button';
-import DropdownButton from 'react-bootstrap/DropdownButton';
-import Dropdown from 'react-bootstrap/Dropdown';
-import ButtonGroup from 'react-bootstrap/ButtonGroup';
 
+import { getSenateMeetingAllAPI, getSenatePointsMeetingIdAPI, putSenatePointAPI} from '../api/senateMeeting'
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
 
-export function PointHistory(props) {
-    return (
-        <div className="point_history_tile">
-            <h5>Change in: {props.when}</h5>
-            <p>Modification: {props.change}</p>
-        </div>
-    );
-}
-
-export function AgendaTile(props){
-    return (
-        <li onClick={props.handleAgendaClick} className="list-item agenda" data-target={"agenda"+props.num}>{props.name}</li>
-    )
-}
+import Select from '@mui/material/Select';
 
 
 
+const SenateDecisions = () => {
+    const [data, setdata] = useState();
+    const [agenda, setagenda] = useState(0);
+    const [point, setpoint] = useState(0);
+    const [pointData, setpointData] = useState();
+    const [resolution, setResolution] = useState();
+    const [Decision, setDecision] = useState();
+
+    const [emptyDecision, setemptyDecision] = useState(false);
+    const [emptyResolution, setemptyResolution] = useState(false);
+    const [DecisionDone, setDecisionDone] = useState(false);
 
 
-// export function
 
 
-class SenateDecisions extends Component {
-    constructor(props){
-        super(props);
-        this.state = {senate:0,point:0,sen_pt:0}
-        // this.data = [{num:1,name:'Agenda 1',points:[
-        //     {num:1,changes:[
-        //         {when:"51st Senate Meeting",change:"SFDSFSDGDFGHFDGFDG"},
-        //         {when:"49st Senate Meeting",change:";lkSFsdfsdfsdfsdfsdfDG"},
-        //         {when:"48st Senate Meeting",change:"jkkSsdfsdfsdfsdfsdfsdfsfsdfsdfGFDG"},
-        //         {when:"46st Senate Meeting",change:"sdfsdfSsdfsdfdsfsdfsdfsdfDG"},
-        //     ]},
-        //     {num:2,changes:[
-        //         {when:"53st Senate Meeting",change:"sfsdSFDSFSDGDFGHFDGFDG"},
-        //         {when:"48st Senate Meeting",change:"QQRWasdasdasdasdasSDAFSASDFfDG"},
-        //         {when:"47st Senate Meeting",change:"QWRWQRSDFGSDFSDFSsdfsdfsdSDFSDFSDfsdfsdfsdfsfsdfsdfGFDG"},
-        //         {when:"45st Senate Meeting",change:"FDHHDFGHSsdfsdfdsfsdfsdfsdfDG"},
-        //     ]},
-        //     {num:3,changes:[{when:"51st Senate Meeting",change:"SFDSFSDGDFGHFDGFDG"}]},
-        //     {num:4,changes:[{when:"51st Senate Meeting",change:"SFDSFSDGDFGHFDGFDG"}]},
-        //     {num:5,changes:[{when:"51st Senate Meeting",change:"SFDSFSDGDFGHFDGFDG"}]},
-        // ]},
-        // {num:2,name:'Agenda 2',points:[1,2,3]},
-        // {num:3,name:'Agenda 3',points:[1,2,3,4]},
-        // {num:4,name:'Agenda 4',points:[1,2,3,4,5,6]},
-        // {num:5,name:'Agenda 5',points:[1,2]}]
 
-        this.data = [{num:3,name:'Agenda 5',points:[
-            {num:1,name:"Ag Pt 1", has_subpoints:true, subpoints:[
-                {num:1,name:"Subpoint 1"},
-                {num:2,name:"Subpoint 2"},
-                {num:3,name:"Subpoint 3"},
-            ]},
-            {num:1,name:"Ag Pt 2", has_subpoints:true, subpoints:[
 
-            ]},
-            {num:1,name:"Ag Pt 2", has_subpoints:false}
-        ]},
-        {num:2,name:'Agenda 2',points:[
-            {num:1,name:"Ag Pt 1", has_subpoints:true, subpoints:[
-                {num:1,name:"Subpoint 1"},
-                {num:2,name:"Subpoint 2"},
-            ]},
-            {num:1,name:"Ag Pt 2", has_subpoints:true, subpoints:[
-                {num:1,name:"Subpoint 1"},
-                {num:2,name:"Subpoint 2"},
-                {num:2,name:"Subpoint 3"},
-            ]},
-        ]},]
+    const handleAgendaClick = (e) => {
+        setagenda(Number(e.target.dataset.target.split("_").slice(-1)));
+        setpoint(0);
     }
 
-    
-    SenateDecisionForm = (props) => {
-      return (
-          <form className="sen_dec_form">
-              <label for="sen_dec_prop" class="form-label">Proposal</label>
-              <textarea readOnly={true} type="text" class="form-control" id="sen_dec_prop" placeholder="Proposal for the Senate Point"></textarea>
-              <label for="sen_dec_res" class="form-label">Resolution</label>
-              <textarea type="text" class="form-control" id="sen_dec_res" placeholder="Resolution for the Senate Point"></textarea>
-        
-              {/* <textarea placeholder="Comments"></textarea> */}
-              <div>
-                  <button className="btn btn-success">Approve</button>
-                  <button className="btn btn-warning">Reject</button>
-                  <button className="btn btn-danger">Delete Point</button>
-              </div>
-          </form>
-      )
-  }
+    const handleSubmit= async(e) => {
+        e.preventDefault();
+        console.log(resolution, Decision);
+        console.log(pointData)
+         !resolution ? setemptyResolution(true) : (!Decision ?  setemptyDecision(true) : await putSenatePointAPI(pointData.id, pointData.num, pointData.senateMeeting, resolution, Decision))
+        if(resolution && Decision)
+        {
+            setDecisionDone(true)
+            setpoint(0);
+            setResolution();
+            setDecision();
 
-   
-    
+        }
 
-    handleSenatePointClick = (e) => {
-        // console.log(e.target.dataset.target.split("_"))
-        this.setState({
-            sen_pt:Number(e.target.dataset.target.split("_").slice(-1)),
-            section:0,
-            point:0
-        })
-    }
 
-    handleSenateClick = (e) => {
-        this.setState({
-            senate: Number(e.target.dataset.target.split("_").slice(-1)),
-            point: 0
-        })
-    }
 
-    
-    handlePointClick = (e) => {
 
-        this.setState({
-            point: Number(e.target.dataset.target.split("_").slice(-1))
-        })
+
+
+
+
+
     }
 
 
-    render() {
-      return (<div className="sen-dec-cont">
-      <div className="col-sm-3 left-pane">
-      <h2>Agendas</h2>
-      <ul className="list-group">
-            {
-                this.data.map((val) => {
-                    return <li data-active={this.state.senate == val.num} onClick={this.handleSenateClick} className="list-item agenda clickable" data-target={"sen_dec_pt_"+val.num}>{val.name}</li>
+    const getdata = async () => {
+        const response = await getSenateMeetingAllAPI();
+        const Meeting = response.body;
+        const new_data = []
+
+
+
+        for (let i = 0; i < Meeting.length; i++) {
+            const pointsArray = []
+            const res2 = await getSenatePointsMeetingIdAPI(Meeting[i].number)
+            for (const points of res2.body.senatePoints) {
+
+                pointsArray.push({
+                    id: points.id,
+                    num: points.number,
+                    name: points.name,
+                    senateMeeting : points.senateMeeting,
+                    proposal: points.proposal,
+                    resolution: points.resolution,
                 })
             }
-      </ul>
-    </div>
 
-    <div className="col-sm-3 senate-submenu center-pane">
-                {this.state.senate !== 0 && <React.Fragment> 
-                    {/* <DropdownButton onSelect={(e) => console.log(e)} as={ButtonGroup} title="Dropdown" id="bg-nested-dropdown">
+            new_data.push({
+                num: Meeting[i].number,
+                name: Meeting[i].announcement,
+                points: pointsArray
+
+            })
+        };
+
+        console.log(new_data);
+        setdata(new_data)
+
+    }
+
+    useEffect(() => {
+        getdata();
+    }, [])
+
+    return (
+        <>
+
+
+            <Snackbar open={emptyDecision} autoHideDuration={3000} onClose={() => { setemptyDecision(false); }}>
+                <Alert onClose={() => { setemptyDecision(false); }} severity="error" sx={{ width: '100%' }}>
+                    Please Select Decision!
+                </Alert>
+            </Snackbar>
+
+            <Snackbar open={emptyResolution} autoHideDuration={3000} onClose={() => { setemptyResolution(false); }}>
+                <Alert onClose={() => { setemptyResolution(false); }} severity="error" sx={{ width: '100%' }}>
+                    Please Write Resolution!
+                </Alert>
+            </Snackbar>
+
+            <Snackbar open={DecisionDone} autoHideDuration={3000} onClose={() => { setDecisionDone(false); }}>
+                <Alert onClose={() => { setDecisionDone(false); }} severity="success" sx={{ width: '100%' }}>
+                    Senate Decision successfully Added!
+                </Alert>
+            </Snackbar>
+
+
+            <div className="agenda-cont">
+                <div className="col-sm-3 agenda-menu left-pane">
+                    <h2>Agendas</h2>
+                    <ul className="list-group">
+                        {
+                            data?.map((val) => {
+                                return <li data-active={agenda === val.num} onClick={handleAgendaClick} className="list-item agenda clickable" data-target={"agenda_" + val.num}>{val.name}</li>
+                            })
+                        }
+                    </ul>
+                </div>
+
+
+
+                <div className="col-sm-3 agenda-submenu center-pane">
+                    {agenda !== 0 && <React.Fragment>
+                        {/* <DropdownButton onSelect={(e) => console.log(e)} as={ButtonGroup} title="Dropdown" id="bg-nested-dropdown">
                         <Dropdown.Item eventKey="1">Delete Selected Agenda</Dropdown.Item>
                         <Dropdown.Item eventKey="2">Finalise Agenda for Senate</Dropdown.Item>
                         <Dropdown.Item eventKey="3">Rename Selected Agenda</Dropdown.Item>
                     </DropdownButton> */}
-                    {/* <button className="btn mb-3" data-target="create-agenda" onClick={this.handlenewpoint}>New Agenda Point</button>  */}
-                    <div className="btn-group">
-                        <button className="btn btn-warning mb-3" data-target="create-agenda" onClick={this.handleDeleteAgenda}>Unfinalise Agenda</button> 
-                        <button className="btn btn-success mb-3" data-target="create-agenda" onClick={this.handleFinaliseAgenda}>Finalise Agenda</button>
-                    </div>
-                     <h2>Agenda Points</h2></React.Fragment>}
-                {this.data.map((val, id) => {
-                    return (
-                        this.state.senate === val.num &&
-                        <ul id={"agenda_" + id} className="list-group">
-                            {val.points.map((det, id) => {
-                                return (
-                                    det.has_subpoints ?
-                                        (<Collapsible trigger={det.name}>
-                                            {
-                                                det.subpoints.map((sp) => {
-                                                    return (
-                                                        <li data-active={this.state.point === det.num} onClick={this.handlePointClick} className="list-item agenda-point clickable" data-target={"agenda-pt_" + sp.num}>Handbook Sub Point {sp.num}</li>
-                                                    )
-                                                })
-                                            }
-                                        </Collapsible>)
 
-                                        : <li data-active={this.state.point === det.num} onClick={this.handlePointClick} className="list-item agenda-point clickable" data-target={"agenda-pt_" + det.num}>{det.name}</li>
-
-                                )
-                            })}
-
-                        </ul>
-                    )
-                })
-                }
-
-            </div>
-
-
-    <div className="col-sm-6 right-pane">
-        {
-          this.state.point != 0 ?
-          <this.SenateDecisionForm /> :
-          <Placeholder text="senate point" feature="take a decision on it" />
-        }
-      {/* <pointHistory className="test">Hello</pointHistory> */}
-      {/* {this.data.map((val) => {
-        return (
-            val.points.map((pt) => {
-                return (
-                    this.state.senate == val.num && this.state.point == pt.num &&
-                    pt.changes.map((ch) => {
+                        <h2>Agenda Points</h2></React.Fragment>}
+                    {data?.map((val, id) => {
                         return (
-                            <PointHistory when={ch.when} change={ch.change}></PointHistory>
+                            agenda === val.num &&
+                            <ul id={"agenda_" + id} className="list-group">
+                                {val.points.map((det, id) => {
+                                    return (
+                                        det.has_subpoints ?
+                                            (<Collapsible trigger={det.name}>
+                                                {
+                                                    det.subpoints.map((sp) => {
+                                                        return (
+                                                            <li data-active={point === det.num} onClick={this.handlePointClick} className="list-item agenda-point clickable" data-target={"agenda-pt_" + sp.num}>Handbook Sub Point {sp.num}</li>
+                                                        )
+                                                    })
+                                                }
+                                            </Collapsible>)
+
+                                            : <li data-active={point === det.num} onClick={(e) => {
+                                                setpoint(Number(e.target.dataset.target.split("_").slice(-1)))
+                                                setpointData(det);
+
+                                                console.log("agenda, point", agenda, point)
+                                                console.log("data", det)
+                                            }} className="list-item agenda-point clickable" data-target={"agenda-pt_" + det.num}>{det.name}</li>
+
+                                    )
+                                })}
+
+                            </ul>
                         )
                     })
-                )
-            })
-        )
-      })} */}
+                    }
 
-    </div>
-</div>);
-    }
-  }
-  export default SenateDecisions;
+                </div>
+
+
+
+
+                <div className="col-sm-6 changes-data pt-5">
+
+                    {
+                        (point === 0 ? (agenda === 0 ?
+                            <h5 className="placeholder-tile">Select agenda and point first to take a decision on it</h5>
+                            : (
+                                <h5 className="placeholder-tile">Select point first to take a decision on it</h5>
+                            )
+                        ) : (<div>
+
+
+                            <form className="sen_dec_form">
+                                <label for="sen_dec_prop" class="form-label">Proposal</label>
+                                <textarea readOnly={true} type="text" class="form-control" id="sen_dec_prop" placeholder={pointData.proposal}></textarea>
+
+
+                                {/* <TextField
+                                    disabled
+                                    id="outlined-disabled"
+                                    label="Proposal"
+                                    defaultValue={pointData.proposal}
+                                />
+
+                                <TextField
+                                    required
+                                    id="outlined-required"
+                                    label="Resolution"
+                                    defaultValue={pointData.resolution}
+                                    onChange={(e) => { setResolution(e.target.value) }}
+                                /> */}
+                                {/* <textarea placeholder="Comments"></textarea> */}
+                                <div>
+                                    <FormControl sx={{ m: 1, minWidth: 120 }}>
+                                        <InputLabel id="demo-simple-select-label">Decision</InputLabel>
+                                        <Select
+                                            labelId="demo-simple-select-label"
+                                            id="demo-simple-select"
+                                            value={Decision}
+                                            label="Age"
+                                            onChange={(e) => { setDecision(e.target.value) }}
+                                        >
+                                            <MenuItem value={1}>Approved</MenuItem>
+                                            <MenuItem value={2}>Not Approved</MenuItem>
+                                            <MenuItem value={3}>Rectified</MenuItem>
+                                            <MenuItem value={4}>Noted</MenuItem>
+
+                                        </Select>
+                                    </FormControl>
+                                </div>
+
+                                <label for="sen_dec_res" class="form-label">Resolution</label>
+                                <textarea type="text" class="form-control" id="sen_dec_res" placeholder={pointData.resolution} onChange={(e) => { setResolution(e.target.value) }}></textarea>
+
+
+                                
+
+
+                            </form>
+
+                            <button className="btn btn-success" onClick={handleSubmit}>Submit</button>
+
+                        </div>))
+
+                    }
+
+
+
+                </div>
+
+
+
+
+
+
+
+            </div>
+        </>
+    )
+
+
+}
+
+export default SenateDecisions;
