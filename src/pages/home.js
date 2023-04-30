@@ -75,6 +75,8 @@ class Home extends Component {
 
         };
 
+        console.log(new_data);
+
         this.setState({
             data: new_data
         }, this.forceUpdate())

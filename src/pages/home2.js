@@ -99,7 +99,6 @@ const Home = () => {
 
             <div className="agenda-cont">
                 <div className="col-sm-3 agenda-menu left-pane">
-                    <button className="btn mb-3" data-target="create-agenda" onClick={() => setopenModal(true)}>Create New Agenda</button>
                     <h2>Agendas</h2>
                     <ul className="list-group">
                         {
@@ -120,8 +119,6 @@ const Home = () => {
                         <Dropdown.Item eventKey="3">Rename Selected Agenda</Dropdown.Item>
                     </DropdownButton> */}
 
-                        <button className="btn btn-primary mb-3" data-target="create-agenda" onClick={() => { setNewPoint(true) }}>New Agenda Point</button>
-                        <button className="btn btn-danger mb-3" data-target="create-agenda" >Delete Agenda</button>
 
                         <h2>Agenda Points</h2></React.Fragment>}
                     {data?.map((val, id) => {
@@ -161,44 +158,8 @@ const Home = () => {
 
 
                 <div className="col-sm-6 changes-data pt-5">
-                    {
-                        NewPoint && (
-                            <div>
+                    
 
-                                <label for="ag_pt_new_prop" class="form-label">Proposal</label>
-                                <input type="number" class="form-control" id="ag_pt_new_prop" placeholder="Enter point number" onChange={(e) => { setnumber(e.target.value) }}></input>
-                                <input type="text" class="form-control" id="ag_pt_new_prop" placeholder="Enter point Name" onChange={(e) => { setname(e.target.value) }}></input>
-
-                                <textarea type="text" class="form-control" id="ag_pt_new_prop" placeholder="Proposal for the Agenda Point" onChange={(e) => { setproposal(e.target.value) }}></textarea>
-
-                                <div>
-                                    <button className="btn btn-success" onClick={handleNewPoint} >Create</button>
-                                    <button className="btn btn-danger" onClick={() => { setNewPoint(false) }}>Cancel</button>
-                                </div>
-                            </div>
-                        )
-                    }
-
-                    {
-                        !NewPoint && (point === 0 ? (agenda === 0 ?
-                            <h5 className="placeholder-tile">Select agenda and point first to view/edit</h5>
-                            : (
-                                <h5 className="placeholder-tile">Select point first to view/edit</h5>
-                            )
-                        ) : (<div>
-
-                            <form className="ag_pt_view">
-                                <label for="ag_pt_view_prop" class="form-label">Proposal</label>
-                                <input readOnly={true} type="text" class="form-control" id="ag_pt_view_prop" placeholder={pointData.name} ></input>
-                                <input readOnly={true} type="text" class="form-control" id="ag_pt_view_prop" placeholder={pointData.proposal}></input>
-                                <button className="btn btn-danger">Delete Point</button>
-
-                            </form>
-
-
-                        </div>))
-
-                    }
 
 
 
