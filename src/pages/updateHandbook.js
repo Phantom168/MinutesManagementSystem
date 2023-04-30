@@ -74,7 +74,7 @@ const handlePublish = async(e) => {
 
     const getdata = async () => {
         const response = await getSenateMeetingAllAPI();
-        const Meeting = response.body;
+        const Meeting = response.body.results;
         const new_data = []
 
         for (let i = 0; i < Meeting.length; i++) {
@@ -103,7 +103,7 @@ const handlePublish = async(e) => {
 
         const newhandbookData = [];
         const handbookResponse = await getHandbookSectionAPI();
-        const section = handbookResponse.body;
+        const section = handbookResponse.body.results;
 
         for (let i = 0; i < section.length; i++) {
 

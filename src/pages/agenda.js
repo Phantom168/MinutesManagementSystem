@@ -88,7 +88,7 @@ const Agenda = () => {
 
     const getdata = async () => {
         const response = await getSenateMeetingAllAPI();
-        const Meeting = response.body;
+        const Meeting = response.body.results;
         const new_data = []
 
 

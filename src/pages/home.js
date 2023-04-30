@@ -37,7 +37,7 @@ class Home extends Component {
 
 
         const response = await getHandbookSectionAPI();
-        const section = response.body;
+        const section = response.body.results;
         const new_data = []
 
         for (let i = 0; i < section.length; i++) {
