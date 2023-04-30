@@ -1,14 +1,16 @@
 import React, { Component } from "react";
-import { getHandbookSectionAPI, getHandbookPointsSectionIdAPI } from '../api/handbook'
+import { getHandbookSectionAPI, getHandbookPointsSectionIdAPI, deleteHandbookSectionAPI } from '../api/handbook'
 import { getSenatePointsIdAPI } from '../api/senateMeeting'
 import '../style.css';
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 var parse = require('html-react-parser');
 
 export function PointHistory(props) {
     return (
         <div className="point_history_tile">
             <h5>Change in: {props.when}</h5>
-           {parse(props.change)}
+            {parse(props.change)}
         </div>
     );
 }
@@ -26,11 +28,13 @@ export function AgendaTile(props) {
 class Home extends Component {
     constructor(props) {
         super(props);
-        this.state = { section: 0, point: 0, data: [] }
+        this.state = { section: 0, point: 0, data: [], deleteSectionopen : false }
     }
 
 
-    async componentWillMount() {
+    async getData() {
+
+
 
         const response = await getHandbookSectionAPI();
         const section = response.body;
@@ -67,19 +71,35 @@ class Home extends Component {
                 points: pointsArray
 
             })
+
+
         };
 
         this.setState({
             data: new_data
         }, this.forceUpdate())
 
-
-
-
     }
 
+    async componentWillMount() {
+        this.getData();
+    }
+
+    async handleDeleteSection(section, e) {
+        console.log(section)
+        await deleteHandbookSectionAPI(section);
+        this.setState({
+            section: 0
+        })
+
+        this.getData();
+        this.setState({
+            deleteSectionopen : true
+        })
+    }
 
     handleAgendaClick = (e) => {
+        console.log(Number(e.target.dataset.target.split("_").slice(-1)))
         this.setState({
             section: Number(e.target.dataset.target.split("_").slice(-1)),
             point: 0
@@ -93,8 +113,25 @@ class Home extends Component {
         })
     }
 
+    setdeleteSectionopen = (open) => {
+        this.setState({
+            deleteSectionopen : open
+        })
+    }
+
     render() {
-        return (<div className="home-cont">
+        return (
+        
+        
+        
+        <div className="home-cont">
+
+<Snackbar open={this.state.deleteSectionopen} autoHideDuration={6000} onClose={() => { this.setdeleteSectionopen(false); }}>
+                <Alert onClose={() => { this.setdeleteSectionopen(false); }} severity="success" sx={{ width: '100%' }}>
+                   Senate Section Deleted!
+                </Alert>
+            </Snackbar>
+
             <div className="col-sm-3 agenda-menu left-pane">
                 {/* <button className="btn mb-3" data-target="create-agenda">Create New Agenda</button> */}
                 <h2>Handbook Sections</h2>
@@ -108,10 +145,10 @@ class Home extends Component {
             </div>
 
             <div className="col-sm-3 section-submenu center-pane">
-                {this.state.section !== 0 && <React.Fragment> 
-                    <button className="btn btn-danger">Delete Selected Section</button> 
+                {this.state.section !== 0 && <React.Fragment>
+                    <button className="btn btn-danger" onClick={(e) => this.handleDeleteSection(this.state.section, e)}>Delete Selected Section</button>
                     <h2>Handbook Points</h2>
-                    </React.Fragment>}
+                </React.Fragment>}
                 {this.state.data?.map((val, id) => {
                     return (
 

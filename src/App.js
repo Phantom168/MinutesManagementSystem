@@ -10,7 +10,7 @@ import { Routes, Route, Outlet, Link, NavLink } from "react-router-dom";
 
 
 export default function App() {
-  const [loginStatus, setLoginStatus] = useState(false);
+  const [loginStatus, setLoginStatus] = useState(true);
   return (
     loginStatus ? 
       (<Routes>
@@ -26,7 +26,7 @@ export default function App() {
           {/* <Route path="*" element={<NoMatch />} /> */}
         </Route>
       </Routes>) :
-      <Login/>
+      <Login setLoginStatus = {setLoginStatus}/>
   );
 }
 

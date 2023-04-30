@@ -20,6 +20,26 @@ const getHandbookSectionAPI = async () => {
     }
 };
 
+const deleteHandbookSectionAPI = async (number) => {
+    try {
+        const res = await fetch(`${API}handbook/handbookSections/${number}/`, {
+            method: "DELETE",
+            // headers: {
+            //     'Authorization': token
+            // }
+        });
+        const response = {
+            status: res.status,
+            body: '',
+        };
+
+        return response;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+
 const getHandbookallPointsAPI = async () => {
     try {
         const res = await fetch(`${API}handbook/handbookPoints/`, {
@@ -86,4 +106,4 @@ const addHandbookSectionAPI = async (handbookSection, text, number) => {
 
 
 
-export {getHandbookSectionAPI, getHandbookallPointsAPI,getHandbookPointsSectionIdAPI, addHandbookSectionAPI };
+export {getHandbookSectionAPI ,deleteHandbookSectionAPI, getHandbookallPointsAPI,getHandbookPointsSectionIdAPI, addHandbookSectionAPI };
