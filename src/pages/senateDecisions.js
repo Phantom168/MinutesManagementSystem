@@ -14,7 +14,7 @@ import Select from '@mui/material/Select';
 
 
 
-const SenateDecisions = () => {
+const SenateDecisions = (props) => {
     const [data, setdata] = useState();
     const [agenda, setagenda] = useState(0);
     const [point, setpoint] = useState(0);
@@ -40,7 +40,7 @@ const SenateDecisions = () => {
         e.preventDefault();
         console.log(resolution, Decision);
         console.log(pointData)
-         !resolution ? setemptyResolution(true) : (!Decision ?  setemptyDecision(true) : await putSenatePointAPI(pointData.id, pointData.num, pointData.senateMeeting, resolution, Decision))
+         !resolution ? setemptyResolution(true) : (!Decision ?  setemptyDecision(true) : await putSenatePointAPI(pointData.id, pointData.num, pointData.senateMeeting, resolution, Decision, props.token))
         if(resolution && Decision)
         {
             setDecisionDone(true)
@@ -61,7 +61,9 @@ const SenateDecisions = () => {
 
     const getdata = async () => {
         setLoadingL(true)
-        const response = await getSenateMeetingAllAPI();
+
+        console.log("this is senate", props.token);
+        const response = await getSenateMeetingAllAPI(props.token);
         const Meeting = response.body.results;
         const new_data = []
 
@@ -69,7 +71,7 @@ const SenateDecisions = () => {
 
         for (let i = 0; i < Meeting.length; i++) {
             const pointsArray = []
-            const res2 = await getSenatePointsMeetingIdAPI(Meeting[i].number)
+            const res2 = await getSenatePointsMeetingIdAPI(Meeting[i].number, props.token)
             for (const points of res2.body.senatePoints) {
 
                 pointsArray.push({

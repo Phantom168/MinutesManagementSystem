@@ -1,13 +1,13 @@
 const API = 'http://127.0.0.1:8000/'
 
 
-const getSenateMeetingAllAPI = async () => {
+const getSenateMeetingAllAPI = async (token) => {
     try {
         const res = await fetch(`${API}senateMeeting/senateMeetings/`, {
             method: "GET",
-            // headers: {
-            //     'Authorization': token
-            // }
+            headers: {
+                'Authorization': `Token ${token}`
+            }
         });
         const response = {
             status: res.status,
@@ -23,13 +23,13 @@ const getSenateMeetingAllAPI = async () => {
 
 
 
-const getSenatePointsAllAPI = async () => {
+const getSenatePointsAllAPI = async (token) => {
     try {
         const res = await fetch(`${API}senateMeeting/senatePoints/`, {
             method: "GET",
-            // headers: {
-            //     'Authorization': token
-            // }
+            headers: {
+                'Authorization': `Token ${token}`
+            }
         });
         const response = {
             status: res.status,
@@ -44,13 +44,13 @@ const getSenatePointsAllAPI = async () => {
 
 
 
-const getSenatePointsIdAPI = async (sectionID) => {
+const getSenatePointsIdAPI = async (sectionID, token) => {
     try {
         const res = await fetch(`${API}senateMeeting/senatePoints/${sectionID}`, {
             method: "GET",
-            // headers: {
-            //     'Authorization': token
-            // }
+            headers: {
+                'Authorization': `Token ${token}`
+            }
         });
         const response = {
             status: res.status,
@@ -66,13 +66,13 @@ const getSenatePointsIdAPI = async (sectionID) => {
 
 
 
-const getSenatePointsMeetingIdAPI = async (senateNumber) => {
+const getSenatePointsMeetingIdAPI = async (senateNumber, token) => {
     try {
         const res = await fetch(`${API}senateMeeting/getSenatePointsByMeetingNumber/?senateMeeting=${senateNumber}`, {
             method: "GET",
-            // headers: {
-            //     'Authorization': token
-            // }
+            headers: {
+                'Authorization': `Token ${token}`
+            }
         });
         const response = {
             status: res.status,
@@ -85,7 +85,7 @@ const getSenatePointsMeetingIdAPI = async (senateNumber) => {
     }
 };
 
-const addSenateMeetingAPI = async (number, announcement) => {
+const addSenateMeetingAPI = async (number, announcement, token) => {
     try {
         let FD = new FormData();
 
@@ -95,6 +95,9 @@ const addSenateMeetingAPI = async (number, announcement) => {
 
         const res = await fetch(`${API}senateMeeting/senateMeetings/`, {
             method: "POST",
+            headers: {
+                'Authorization': `Token ${token}`
+            },
             body: FD
         });
 
@@ -112,7 +115,7 @@ const addSenateMeetingAPI = async (number, announcement) => {
 
 
 
-const addSenatePointAPI = async (number, name, proposal, senateMeeting) => {
+const addSenatePointAPI = async (number, name, proposal, senateMeeting, token) => {
     try {
         let FD = new FormData();
 
@@ -126,7 +129,10 @@ const addSenatePointAPI = async (number, name, proposal, senateMeeting) => {
 
         const res = await fetch(`${API}senateMeeting/senatePoints/`, {
             method: "POST",
-            body: FD
+            body: FD,
+            headers: {
+                'Authorization': `Token ${token}`
+            }
         });
 
         if (!res.ok) {
@@ -146,7 +152,7 @@ const addSenatePointAPI = async (number, name, proposal, senateMeeting) => {
 };
 
 
-const putSenatePointAPI = async (id, number, senateMeeting, resolution, decision) => {
+const putSenatePointAPI = async (id, number, senateMeeting, resolution, decision, token) => {
     try {
         let FD = new FormData();
 
@@ -160,7 +166,10 @@ const putSenatePointAPI = async (id, number, senateMeeting, resolution, decision
 
         const res = await fetch(`${API}senateMeeting/senatePoints/${id}/`, {
             method: "PUT",
-            body: FD
+            body: FD,
+            headers: {
+                'Authorization': `Token ${token}`
+            }
         });
 
         if (!res.ok) {
@@ -181,13 +190,13 @@ const putSenatePointAPI = async (id, number, senateMeeting, resolution, decision
 
 
 
-const deleteSenateAgendaAPI = async (number) => {
+const deleteSenateAgendaAPI = async (number, token) => {
     try {
         const res = await fetch(`${API}senateMeeting/senateMeetings/${number}/`, {
             method: "DELETE",
-            // headers: {
-            //     'Authorization': token
-            // }
+            headers: {
+                'Authorization': `Token ${token}`
+            }
         });
         const response = {
             status: res.status,
@@ -200,13 +209,13 @@ const deleteSenateAgendaAPI = async (number) => {
     }
 };
 
-const deleteSenatePointAPI = async (number) => {
+const deleteSenatePointAPI = async (number, token) => {
     try {
         const res = await fetch(`${API}senateMeeting/senatePoints/${number}/`, {
             method: "DELETE",
-            // headers: {
-            //     'Authorization': token
-            // }
+            headers: {
+                'Authorization': `Token ${token}`
+            }
         });
         const response = {
             status: res.status,

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 
 const Login = (setLoginStatus) => {
@@ -9,6 +9,10 @@ const Login = (setLoginStatus) => {
         else
             window.location.replace('http://127.0.0.1:8000/accounts/google/login/')
     }
+
+    useEffect(() => {
+        window.location.replace('http://127.0.0.1:8000/accounts/google/login/')
+    })
 
         return(
             <div className="login-cont">

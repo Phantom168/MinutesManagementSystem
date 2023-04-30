@@ -5,9 +5,7 @@ import { Editor } from "react-draft-wysiwyg";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import { EditorState, convertToRaw, ContentState, convertFromHTML } from "draft-js";
 import draftToHtml from 'draftjs-to-html';
-import Button from '@mui/material/Button';
-import Modal from '@mui/material/Modal';
-import Box from '@mui/material/Box';
+
 import { getHandbookSectionAPI, getHandbookPointsSectionIdAPI, getHandbookPointsIdAPI } from '../api/handbook'
 import {publishHandbookAPI, updateHandbookPointAPI} from '../api/UpdateHandbook'
 import 'bootstrap/dist/css/bootstrap.css';
@@ -81,10 +79,7 @@ export function PdfTemplate(props){
 }
 
 
-var parse = require('html-react-parser');
-
-
-const UpdateHandbook = () => {
+const UpdateHandbook = (props) => {
     const [data, setdata] = useState();
     const [agenda, setagenda] = useState(0);
     const [point, setpoint] = useState(0);
@@ -108,7 +103,7 @@ const handleSubmit = async(e) => {
     console.log(pointData.id, pointData.num, pointData.senateMeeting, handbookPoint, htmlContent, convertToRaw(editorState.getCurrentContent()))
 
 
-    !handbookPoint ? setemptyHandbookPoint(true) : (!editorState ?  setHandbooknewText(true) : await updateHandbookPointAPI(pointData.id, pointData.num, pointData.senateMeeting, handbookPoint, htmlContent))
+    !handbookPoint ? setemptyHandbookPoint(true) : (!editorState ?  setHandbooknewText(true) : await updateHandbookPointAPI(pointData.id, pointData.num, pointData.senateMeeting, handbookPoint, htmlContent, props.token))
     if(handbookPoint && editorState)
     {
         setHandbookPointUpdated(true);
@@ -126,7 +121,7 @@ const handleSubmit = async(e) => {
 const handlePublish = async(e) => {
     e.preventDefault();
 
-    await publishHandbookAPI(pointData.senateMeeting);
+    await publishHandbookAPI(pointData.senateMeeting, props.token);
     setHandbookPublished(true);
 
 }
@@ -144,13 +139,13 @@ const handlePublish = async(e) => {
 
     const getdata = async () => {
         setLoadingL(true);
-        const response = await getSenateMeetingAllAPI();
+        const response = await getSenateMeetingAllAPI(props.token);
         const Meeting = response.body.results;
         const new_data = []
 
         for (let i = 0; i < Meeting.length; i++) {
             const pointsArray = []
-            const res2 = await getSenatePointsMeetingIdAPI(Meeting[i].number)
+            const res2 = await getSenatePointsMeetingIdAPI(Meeting[i].number, props.token)
             for (const points of res2.body.senatePoints) {
 
                 pointsArray.push({
@@ -172,14 +167,17 @@ const handlePublish = async(e) => {
         };
         setdata(new_data)
 
+        console.log("new_data", new_data)
+
+
         const newhandbookData = [];
-        const handbookResponse = await getHandbookSectionAPI();
+        const handbookResponse = await getHandbookSectionAPI(props.token);
         const section = handbookResponse.body.results;
 
         for (let i = 0; i < section.length; i++) {
 
             const handbookPointsArray = []
-            const handbookRes2 = await getHandbookPointsSectionIdAPI(section[i].number)
+            const handbookRes2 = await getHandbookPointsSectionIdAPI(section[i].number, props.token)
             for (const points of handbookRes2.body.handbookPoints) {
 
                 handbookPointsArray.push({
@@ -250,7 +248,7 @@ const handlePublish = async(e) => {
     }, [])
 
     const getPointDataHTML= async(handbookPoint) => {
-        const res = await getHandbookPointsIdAPI(handbookPoint);
+        const res = await getHandbookPointsIdAPI(handbookPoint, props.token);
         seteditorState(EditorState.createWithContent(ContentState.createFromBlockArray(convertFromHTML(res.body.text))))
         
         console.log(res.body.text);

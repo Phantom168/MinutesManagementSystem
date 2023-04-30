@@ -1,13 +1,13 @@
 const API = 'http://127.0.0.1:8000/'
 
 
-const getHandbookSectionAPI = async () => {
+const getHandbookSectionAPI = async (token) => {
     try {
         const res = await fetch(`${API}handbook/handbookSections/`, {
             method: "GET",
-            // headers: {
-            //     'Authorization': token
-            // }
+            headers: {
+                'Authorization': `Token ${token}`
+            }
         });
         const response = {
             status: res.status,
@@ -20,13 +20,13 @@ const getHandbookSectionAPI = async () => {
     }
 };
 
-const deleteHandbookSectionAPI = async (number) => {
+const deleteHandbookSectionAPI = async (number, token) => {
     try {
         const res = await fetch(`${API}handbook/handbookSections/${number}/`, {
             method: "DELETE",
-            // headers: {
-            //     'Authorization': token
-            // }
+            headers: {
+                'Authorization': `Token ${token}`
+            }
         });
         const response = {
             status: res.status,
@@ -40,13 +40,13 @@ const deleteHandbookSectionAPI = async (number) => {
 };
 
 
-const deleteHandbookPointAPI = async (number) => {
+const deleteHandbookPointAPI = async (number, token) => {
     try {
         const res = await fetch(`${API}handbook/handbookPoints/${number}/`, {
             method: "DELETE",
-            // headers: {
-            //     'Authorization': token
-            // }
+            headers: {
+                'Authorization': `Token ${token}`
+            }
         });
         const response = {
             status: res.status,
@@ -60,13 +60,13 @@ const deleteHandbookPointAPI = async (number) => {
 };
 
 
-const getHandbookallPointsAPI = async () => {
+const getHandbookallPointsAPI = async (token) => {
     try {
         const res = await fetch(`${API}handbook/handbookPoints/`, {
             method: "GET",
-            // headers: {
-            //     'Authorization': token
-            // }
+            headers: {
+                'Authorization': `Token ${token}`
+            }
         });
         const response = {
             status: res.status,
@@ -79,13 +79,13 @@ const getHandbookallPointsAPI = async () => {
     }
 };
 
-const getHandbookPointsSectionIdAPI = async (sectionNumber) => {
+const getHandbookPointsSectionIdAPI = async (sectionNumber, token) => {
     try {
         const res = await fetch(`${API}handbook/getHandbookPointsBySectionNumber/?handbookSection=${sectionNumber}`, {
             method: "GET",
-            // headers: {
-            //     'Authorization': token
-            // }
+            headers: {
+                'Authorization': `Token ${token}`
+            }
         });
         const response = {
             status: res.status,
@@ -99,10 +99,13 @@ const getHandbookPointsSectionIdAPI = async (sectionNumber) => {
 };
 
 
-const getHandbookPointsIdAPI = async (id) => {
+const getHandbookPointsIdAPI = async (id, token) => {
     try {
         const res = await fetch(`${API}handbook/handbookPoints/${id}`, {
             method: "GET",
+            headers: {
+                'Authorization': `Token ${token}`
+            }
 
         });
         const response = {
@@ -118,7 +121,7 @@ const getHandbookPointsIdAPI = async (id) => {
 
 
 
-const addHandbookSectionAPI = async (handbookSection, text, number) => {
+const addHandbookSectionAPI = async (handbookSection, text, number, token) => {
     try {
         const res = await fetch(`${API}handbook/handbookPoints`, {
             method: "POST",
@@ -126,6 +129,9 @@ const addHandbookSectionAPI = async (handbookSection, text, number) => {
                 // 'Authorization': token,
                 Accept: "application/json",
                 "Content-Type": "application/json",
+                headers: {
+                    'Authorization': `Token ${token}`
+                }
             },
             body: JSON.stringify({ "handbookSection": handbookSection, "text": text, "number": number }),
         });

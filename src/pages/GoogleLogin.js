@@ -10,18 +10,16 @@ const GoogleLogin = (props) => {
     const queryParameters = new URLSearchParams(window.location.search);
     const tokenReceived = queryParameters.get("token")
 
-    const [token, setToken] = useState()
-
     useEffect(() => {
         props.setLoginStatus(true);
-        setToken(tokenReceived);
+        props.setToken(tokenReceived);
         console.log(tokenReceived);
 
-    }, [tokenReceived])
+    }, [props, tokenReceived])
 
     return (
         <>
-            {token && <Navigate to="/" />}
+            {tokenReceived && <Navigate to="/" />}
 
         </>
     );

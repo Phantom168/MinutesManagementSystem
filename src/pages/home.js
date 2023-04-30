@@ -40,15 +40,15 @@ class Home extends Component {
 
     async getData() {
 
-
+        console.log("this is home token", this.props.token)
         this.setState({loadingL:true})
-        const response = await getHandbookSectionAPI();
+        const response = await getHandbookSectionAPI(this.props.token);
         const section = response.body.results;
         const new_data = []
 
         for (let i = 0; i < section.length; i++) {
             const pointsArray = []
-            const res2 = await getHandbookPointsSectionIdAPI(section[i].number);
+            const res2 = await getHandbookPointsSectionIdAPI(section[i].number, this.props.token);
             for (const points of res2.body.handbookPoints) {
                 const changes = []
                 const versionHistory = points.versionHistory;
@@ -60,7 +60,7 @@ class Home extends Component {
                     })
                 }
                 for (const version of versionHistory) {
-                    const version_data = await getSenatePointsIdAPI(version);
+                    const version_data = await getSenatePointsIdAPI(version, this.props.token);
                     changes.push({
                         when: `${version_data.body.senateMeeting} Senate Meeting`,
                         change: version_data.body.handbookPointNewText
@@ -98,7 +98,7 @@ class Home extends Component {
 
     async handleDeleteSection(section, e) {
         console.log(section)
-        await deleteHandbookSectionAPI(section);
+        await deleteHandbookSectionAPI(section, this.props.token);
         this.setState({
             section: 0
         })
@@ -111,7 +111,7 @@ class Home extends Component {
 
     async handleDeletePoint(point, e){
         console.log(point);
-        await deleteHandbookPointAPI(point);
+        await deleteHandbookPointAPI(point, this.props.token);
         this.setState({
             point : 0
         })

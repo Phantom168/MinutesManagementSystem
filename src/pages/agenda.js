@@ -11,12 +11,11 @@ import Modal from '@mui/material/Modal';
 import Placeholder from 'react-bootstrap/Placeholder';
 import FormControl from '@mui/material/FormControl';
 import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
 
 
 
 
-const Agenda = () => {
+const Agenda = (props) => {
     const [data, setdata] = useState();
     const [agenda, setagenda] = useState(0);
     const [point, setpoint] = useState(0);
@@ -58,7 +57,7 @@ const Agenda = () => {
         console.log("meetingNumber", meetingNumber)
         if (meetingNumber && announcement)
         {
-            await addSenateMeetingAPI(meetingNumber, announcement)
+            await addSenateMeetingAPI(meetingNumber, announcement, props.token)
             setmeetingCreated(true);
             handleModalClose()
             getdata();
@@ -82,7 +81,7 @@ const Agenda = () => {
 
 
     const handleNewPoint = async () => {
-        await addSenatePointAPI(number, name, proposal, agenda);
+        await addSenatePointAPI(number, name, proposal, agenda, props.token);
         setnewpointCreated(true);
         getdata();
         setNewPoint(false)
@@ -91,14 +90,14 @@ const Agenda = () => {
     }
 
     const handleDeleteAgenda = async() => {
-        await deleteSenateAgendaAPI(agenda);
+        await deleteSenateAgendaAPI(agenda, props.token);
         getdata();
         setopenDeleteAgenda(true);
     }
 
     const handleDeletePoint = async(e) => {
         e.preventDefault();
-        await deleteSenatePointAPI(point);
+        await deleteSenatePointAPI(point, props.token);
         getdata();
         setopenDeletePoint(true);
     }
@@ -107,7 +106,7 @@ const Agenda = () => {
 
     const getdata = async () => {
         setLoadingL(true);
-        const response = await getSenateMeetingAllAPI();
+        const response = await getSenateMeetingAllAPI(props.token);
         const Meeting = response.body.results;
         const new_data = []
 
@@ -115,7 +114,7 @@ const Agenda = () => {
 
         for (let i = 0; i < Meeting.length; i++) {
             const pointsArray = []
-            const res2 = await getSenatePointsMeetingIdAPI(Meeting[i].number)
+            const res2 = await getSenatePointsMeetingIdAPI(Meeting[i].number, props.token)
             for (const points of res2.body.senatePoints) {
                 // const changes = []
                 // console.log("points", points)
@@ -222,6 +221,11 @@ const Agenda = () => {
                 </Alert>
             </Snackbar>
 
+            <Snackbar open={meetingCreated} autoHideDuration={6000} onClose={() => { setmeetingCreated(false); }}>
+                <Alert onClose={() => { setmeetingCreated(false); }} severity="success" sx={{ width: '100%' }}>
+                    New Agenda Meeting Created!
+                </Alert>
+            </Snackbar>
 
 
             <Snackbar open={openDeleteAgenda} autoHideDuration={6000} onClose={() => { setopenDeleteAgenda(false); }}>
