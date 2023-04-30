@@ -182,7 +182,7 @@ class Home extends Component {
                     return (
                         val.points?.map((pt) => {
                             return (
-                                this.state.section === val.num && this.state.point === pt.num &&
+                                this.state.section === val.num && this.state.point === pt.id &&
                                 pt.changes?.map((ch) => {
                                     return (
                                         <PointHistory when={ch.when} change={ch.change}></PointHistory>

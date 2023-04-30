@@ -1,12 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Collapsible from "react-collapsible";
+import HandbookPDFTemplate from "./utils/HandbookPDFTemplate";
 import { Editor } from "react-draft-wysiwyg";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import { EditorState, convertToRaw } from "draft-js";
 import draftToHtml from 'draftjs-to-html';
 import { getHandbookSectionAPI, getHandbookPointsSectionIdAPI } from '../api/handbook'
-import {publishHandbookAPI, updateHandbookPointAPI} from '../api/UpdateHandbook'
-
+import {publishHandbookAPI, updateHandbookPointAPI, getHandbookPointsAPI} from '../api/UpdateHandbook'
+import Button from '@mui/material/Button';
+import Modal from '@mui/material/Modal';
+import Box from '@mui/material/Box';
 import { getSenateMeetingAllAPI, getSenatePointsMeetingIdAPI } from '../api/senateMeeting'
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
@@ -14,8 +17,66 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import TextField from '@mui/material/TextField';
-
 import Select from '@mui/material/Select';
+import jsPDF from 'jspdf';
+import ReactToPrint, {useReactToPrint } from "react-to-print";
+var parse = require('html-react-parser');
+
+
+export function PdfTemplate(props){
+    const hb = props.hb
+    const styles = {
+        page:{
+            width:"75%",
+            margin:"auto",
+            padding:"96px 0"
+        },
+        section:{
+            color:"#7030a0",
+            margin:"auto",
+            marginBottom:"10px",
+        },
+        section_cont:{
+            textAlign:"center"
+        },
+        sub_heading:{
+            color:"#7030a0",
+        },
+        pt_content:{
+            marginBottom:"48px",
+        },
+        pt_content_for_last_pt:{
+            marginBottom:"96px",
+        }
+    }
+
+
+
+
+    return (<div className="hb-pdf" style={styles.page} >
+        {
+            hb.map((section, sec_idx) => {
+                return (<div>
+                    <div style={styles.section_cont}>
+                        <h5 style={styles.section}>{section.name}</h5>
+                    </div>
+                    {section.points.map((pt, pt_idx) => {
+                        return (<>
+                                    <h6 style={styles.sub_heading}>{sec_idx + 1}.{pt_idx +1}</h6>
+                                    <p style={pt_idx !== section.points.length -1 ? 
+                                        styles.pt_content : 
+                                        styles.pt_content_for_last_pt}>
+                                    {parse(pt.text)}</p>
+                            </>);
+                    })}
+                </div>)
+                })
+        }
+    
+    </div>)
+    
+}
+
 
 
 
@@ -32,6 +93,8 @@ const UpdateHandbook = () => {
     const [emptyHandbookPoint, setemptyHandbookPoint] = useState(false);
     const [HandbookPointUpdated, setHandbookPointUpdated] = useState(false);
     const [HandbooknewText, setHandbooknewText] = useState(false);
+    const [show, setShow] = useState(false)
+    const pdfRef = useRef(null);
 
 const handleSubmit = async(e) => {
     e.preventDefault();
@@ -70,6 +133,7 @@ const handlePublish = async(e) => {
         setpoint(0);
     }
 
+    const handleClose = () => setShow(false)
 
 
     const getdata = async () => {
@@ -128,13 +192,53 @@ const handlePublish = async(e) => {
         setdata(new_data);
         setHandbookData(newhandbookData)
 
+        
 
     }
+
+
+    function sleep(milliseconds) {
+        const date = Date.now();
+        let currentDate = null;
+        do {
+          currentDate = Date.now();
+        } while (currentDate - date < milliseconds);
+      }
+    
+
+    const createPDF = (myRef) => {
+
+        const doc = new jsPDF();
+        // setShow(true);
+        doc.html(myRef.current, {
+            async callback(doc) {
+                await doc.save('pdf_name');
+            },
+        });
+    }
+
+
+    const handlePrint = useReactToPrint({
+        content: () => pdfRef.current,
+      });
+    
+
+
+    // const getHandbookData = async () => {
+    //     const res = await getHandbookPointsAPI();
+    //     const body = res.body;
+    //     console.log("tetdfgdfg",res,body);
+    // }
+
+
+
+    
 
 
 
     useEffect(() => {
         getdata();
+        
     }, [])
 
     return (
@@ -168,7 +272,22 @@ const handlePublish = async(e) => {
 
             <div className="up_hb_cont">
                 <div className="col-sm-3 up_hb_menu left-pane">
-                    <button className="btn btn-primary">Preview Handbook</button>
+                    {/* <button className="btn btn-primary" onClick={() => {setShow(true)}}>Preview Handbook</button> */}
+                    <ReactToPrint
+                        content={React.useCallback(() => {
+                            return pdfRef.current;
+                        }, [pdfRef.current])}
+                        documentTitle="AwesomeFileName"
+                        trigger={React.useCallback(()=>{
+                            return <button className="btn btn-primary">Preview Handbook</button>
+                        },[])}
+                    />
+                    {console.log(HandbookData)}
+                    <div style={{display:"none"}}>
+                        {HandbookData && <HandbookPDFTemplate ref={pdfRef} hb={HandbookData} />}
+                    </div>
+
+
                     <button className="btn btn-primary" onClick={handlePublish}>Publish Handbook</button>
                     <h2>Senate Decisions</h2>
                     <ul className="list-group">
@@ -230,7 +349,7 @@ const handlePublish = async(e) => {
 
 
                 <div className="col-sm-6 changes-data pt-5">
-
+                
                     {
                         (point === 0 ? (agenda === 0 ?
                             <h5 className="placeholder-tile">Select senate point to edit the handbook</h5>
@@ -347,13 +466,32 @@ const handlePublish = async(e) => {
 
                 </div>
 
-
-
-
-
-
-
             </div>
+
+            {/* <Modal open={show} onHide={handleClose}>
+                
+                <>
+                <Button onClick={handleClose}>Close</Button>
+                <ReactToPrint
+                    content={React.useCallback(() => {
+                        return pdfRef.current;
+                      }, [pdfRef.current])}
+                    documentTitle="AwesomeFileName"
+                    onAfterPrint={React.useCallback(() => {
+                        setShow(false)
+                      }, [])}
+                    // onBeforeGetContent={handleOnBeforeGetContent}
+                    // onBeforePrint={React.useCallback(() => {
+                    //     setShow()
+                    //   }, []);}
+                    trigger={React.useCallback(()=>{
+                        return <button>Print</button>
+                    },[])}
+                />
+               
+                    
+               
+            </Modal>  */}
         </>
     )
 
