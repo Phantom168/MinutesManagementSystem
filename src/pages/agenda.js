@@ -6,6 +6,9 @@ import {GiCancel} from "react-icons/gi";
 import {FaRegFilePowerpoint} from "react-icons/fa";
 import {IoCreateOutline} from "react-icons/io5";
 import { getSenateMeetingAllAPI, getSenatePointsMeetingIdAPI, addSenateMeetingAPI, addSenatePointAPI } from '../api/senateMeeting'
+import 'bootstrap/dist/css/bootstrap.css';
+
+import { getSenateMeetingAllAPI, getSenatePointsMeetingIdAPI, addSenateMeetingAPI, addSenatePointAPI, deleteSenateAgendaAPI,  deleteSenatePointAPI} from '../api/senateMeeting'
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import Box from '@mui/material/Box';
@@ -34,6 +37,10 @@ const Agenda = () => {
     const [meetingCreated, setmeetingCreated] = useState(false);
     const [openModal, setopenModal] = useState(false);
     const [loadingL, setLoadingL] = useState(true);
+
+    const [openDeleteAgenda, setopenDeleteAgenda] = useState(false);
+    const [openDeletePoint, setopenDeletePoint] = useState(false);
+    
     const [emptyAnnoucement, setemptyAnnoucement] =useState(false)
     const [announcement, setannouncement] = useState()
 
@@ -88,6 +95,20 @@ const Agenda = () => {
 
 
     }
+
+    const handleDeleteAgenda = async() => {
+        await deleteSenateAgendaAPI(agenda);
+        getdata();
+        setopenDeleteAgenda(true);
+    }
+
+    const handleDeletePoint = async(e) => {
+        e.preventDefault();
+        await deleteSenatePointAPI(point);
+        getdata();
+        setopenDeletePoint(true);
+    }
+
 
 
     const getdata = async () => {
@@ -209,9 +230,15 @@ const Agenda = () => {
 
 
 
-            <Snackbar open={meetingCreated} autoHideDuration={6000} onClose={() => { setmeetingCreated(false); }}>
-                <Alert onClose={() => { setmeetingCreated(false); }} severity="success" sx={{ width: '100%' }}>
-                    New Senate Agenda Created!
+            <Snackbar open={openDeleteAgenda} autoHideDuration={6000} onClose={() => { setopenDeleteAgenda(false); }}>
+                <Alert onClose={() => { setopenDeleteAgenda(false); }} severity="success" sx={{ width: '100%' }}>
+                    Senate Agenda Deleted!
+                </Alert>
+            </Snackbar>
+
+            <Snackbar open={openDeletePoint} autoHideDuration={6000} onClose={() => { setopenDeletePoint(false); }}>
+                <Alert onClose={() => { setopenDeletePoint(false); }} severity="success" sx={{ width: '100%' }}>
+                Senate Agenda Point Deleted!
                 </Alert>
             </Snackbar>
 
@@ -247,8 +274,8 @@ const Agenda = () => {
                         <Dropdown.Item eventKey="3">Rename Selected Agenda</Dropdown.Item>
                     </DropdownButton> */}
 
-                        <button className="btn btn-primary mb-3" data-target="create-agenda" onClick={() => { setNewPoint(true) }}><FaRegFilePowerpoint/>  New Agenda Point</button>
-                        <button className="btn btn-danger mb-3" data-target="create-agenda" ><AiTwotoneDelete/> Delete Agenda</button>
+                        <button className="btn btn-primary mb-3" data-target="create-agenda" onClick={() => { setNewPoint(true) }}><FaRegFilePowerpoint/> New Agenda Point</button>
+                        <button className="btn btn-danger mb-3" data-target="create-agenda" onClick={handleDeleteAgenda}><AiTwotoneDelete/>  Delete Agenda</button>
 
                         <h2>Agenda Points</h2></React.Fragment>}
                     {data?.map((val, id) => {
@@ -319,9 +346,12 @@ const Agenda = () => {
                                 <label for="ag_pt_view_prop" class="form-label">Proposal</label>
                                 <input readOnly={true} type="text" class="form-control" id="ag_pt_view_prop" placeholder={pointData.name} ></input>
                                 <input readOnly={true} type="text" class="form-control" id="ag_pt_view_prop" placeholder={pointData.proposal}></input>
+
                                 <div>
-                                    <button className="btn btn-danger"><AiTwotoneDelete/> Delete Point</button>
+   
+                                    <button className="btn btn-danger" onClick={handleDeletePoint}><AiTwotoneDelete/> Delete Point</button>
                                 </div>
+
 
                             </form>
 

@@ -8,6 +8,7 @@ import InputLabel from '@mui/material/InputLabel';
 import Placeholder from 'react-bootstrap/Placeholder';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
+import 'bootstrap/dist/css/bootstrap.css';
 
 import Select from '@mui/material/Select';
 
@@ -44,9 +45,7 @@ const SenateDecisions = () => {
         {
             setDecisionDone(true)
             setpoint(0);
-            setResolution();
-            setDecision();
-
+            getdata();
         }
 
 
@@ -80,6 +79,8 @@ const SenateDecisions = () => {
                     senateMeeting : points.senateMeeting,
                     proposal: points.proposal,
                     resolution: points.resolution,
+                    approvalComplete : points.approvalComplete,
+                    approved : points.approved
                 })
             }
 
@@ -175,6 +176,9 @@ const SenateDecisions = () => {
                                             : <li data-active={point === det.id} onClick={(e) => {
                                                 setpoint(Number(e.target.dataset.target.split("_").slice(-1)))
                                                 setpointData(det);
+                                                setResolution(det.resolution)
+                                                setDecision(1)
+                                                
 
                                                 console.log("agenda, point", agenda, point)
                                                 console.log("data", det)
@@ -228,10 +232,10 @@ const SenateDecisions = () => {
                                     <FormControl sx={{ m: 1, minWidth: 120 }}>
                                         <InputLabel id="demo-simple-select-label">Decision</InputLabel>
                                         <Select
+                                        defaultValue={pointData.approved + 1}
                                             labelId="demo-simple-select-label"
                                             id="demo-simple-select"
-                                            value={Decision}
-                                            label="Age"
+                                            label="Decision"
                                             onChange={(e) => { setDecision(e.target.value) }}
                                         >
                                             <MenuItem value={1}>Approved</MenuItem>
@@ -244,7 +248,7 @@ const SenateDecisions = () => {
                                 </div>
 
                                 <label for="sen_dec_res" class="form-label">Resolution</label>
-                                <textarea type="text" class="form-control" id="sen_dec_res" placeholder={pointData.resolution} onChange={(e) => { setResolution(e.target.value) }}></textarea>
+                                <textarea type="text" class="form-control" id="sen_dec_res" defaultValue = {pointData.resolution} onChange={(e) => { setResolution(e.target.value) }}></textarea>
 
 
                                 

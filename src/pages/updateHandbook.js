@@ -5,13 +5,15 @@ import {TiTick} from "react-icons/ti";
 import {MdPreview, MdPublish} from "react-icons/md";
 import { Editor } from "react-draft-wysiwyg";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
-import { EditorState, convertToRaw } from "draft-js";
+import { EditorState, convertToRaw, ContentState, convertFromHTML } from "draft-js";
 import draftToHtml from 'draftjs-to-html';
-import { getHandbookSectionAPI, getHandbookPointsSectionIdAPI } from '../api/handbook'
-import {publishHandbookAPI, updateHandbookPointAPI, getHandbookPointsAPI} from '../api/UpdateHandbook'
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
+import { getHandbookSectionAPI, getHandbookPointsSectionIdAPI, getHandbookPointsIdAPI } from '../api/handbook'
+import {publishHandbookAPI, updateHandbookPointAPI} from '../api/UpdateHandbook'
+import 'bootstrap/dist/css/bootstrap.css';
+
 import { getSenateMeetingAllAPI, getSenatePointsMeetingIdAPI } from '../api/senateMeeting'
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
@@ -81,6 +83,7 @@ export function PdfTemplate(props){
 }
 
 
+var parse = require('html-react-parser');
 
 
 const UpdateHandbook = () => {
@@ -89,6 +92,7 @@ const UpdateHandbook = () => {
     const [point, setpoint] = useState(0);
     const [handbookSection, sethandbookSection] = useState();
     const [handbookPoint, sethandbookPoint] = useState();
+    
     const [HandbookData, setHandbookData] = useState();
     const [pointData, setpointData] = useState();
     const [editorState, seteditorState] = useState(EditorState.createEmpty());
@@ -246,6 +250,19 @@ const handlePublish = async(e) => {
         getdata();
         
     }, [])
+
+    const getPointDataHTML= async(handbookPoint) => {
+        const res = await getHandbookPointsIdAPI(handbookPoint);
+        seteditorState(EditorState.createWithContent(ContentState.createFromBlockArray(convertFromHTML(res.body.text))))
+        
+        console.log(res.body.text);
+
+    }
+
+    useEffect(()=> {
+        handbookPoint && getPointDataHTML(handbookPoint)
+    }, [handbookPoint])
+
 
     return (
         <>
@@ -429,7 +446,7 @@ const handlePublish = async(e) => {
                                                         {
                                                             HandbookData[handbookSection-1].points.map((det) => {
                                                                 return (
-                                                                    <MenuItem value={det.id}>{det.text}</MenuItem>
+                                                                    <MenuItem value={det.id}>{parse(det.text)}</MenuItem>
                                                                 )
                                                             })
                                                         }
