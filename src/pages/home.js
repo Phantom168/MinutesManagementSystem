@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { getHandbookSectionAPI, getHandbookPointsSectionIdAPI, deleteHandbookSectionAPI } from '../api/handbook'
 import { getSenatePointsIdAPI } from '../api/senateMeeting'
+import {AiTwotoneDelete} from "react-icons/ai";
 import '../style.css';
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
@@ -162,7 +163,7 @@ class Home extends Component {
 
             <div className="col-sm-3 section-submenu center-pane">
                 {this.state.section !== 0 && <React.Fragment>
-                    <button className="btn btn-danger" onClick={(e) => this.handleDeleteSection(this.state.section, e)}>Delete Selected Section</button>
+                    <button className="btn btn-danger" onClick={(e) => this.handleDeleteSection(this.state.section, e)}><AiTwotoneDelete/> Delete Selected Section</button>
                     <h2>Handbook Points</h2>
                 </React.Fragment>}
                 {this.state.data?.map((val, id) => {
@@ -187,7 +188,7 @@ class Home extends Component {
                 {/* <pointHistory className="test">Hello</pointHistory> */}
                 {this.state.section !== 0 && this.state.point !== 0 && <React.Fragment>
                     <div className="btn-container">
-                        <button className="btn btn-danger">Delete Selected Point</button>
+                        <button className="btn btn-danger"><AiTwotoneDelete/> Delete Selected Point</button>
                     </div>
                     <h2>Version History</h2>
                 </React.Fragment>}
