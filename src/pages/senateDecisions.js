@@ -1,25 +1,27 @@
 import React, { useEffect, useState } from "react";
 import Collapsible from "react-collapsible";
-
+import {TiTick} from "react-icons/ti";
 import { getSenateMeetingAllAPI, getSenatePointsMeetingIdAPI, putSenatePointAPI} from '../api/senateMeeting'
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import InputLabel from '@mui/material/InputLabel';
+import Placeholder from 'react-bootstrap/Placeholder';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
+import 'bootstrap/dist/css/bootstrap.css';
 
 import Select from '@mui/material/Select';
 
 
 
-const SenateDecisions = () => {
+const SenateDecisions = (props) => {
     const [data, setdata] = useState();
     const [agenda, setagenda] = useState(0);
     const [point, setpoint] = useState(0);
     const [pointData, setpointData] = useState();
     const [resolution, setResolution] = useState();
     const [Decision, setDecision] = useState();
-
+    const [loadingL, setLoadingL] = useState(true);
     const [emptyDecision, setemptyDecision] = useState(false);
     const [emptyResolution, setemptyResolution] = useState(false);
     const [DecisionDone, setDecisionDone] = useState(false);
@@ -38,14 +40,12 @@ const SenateDecisions = () => {
         e.preventDefault();
         console.log(resolution, Decision);
         console.log(pointData)
-         !resolution ? setemptyResolution(true) : (!Decision ?  setemptyDecision(true) : await putSenatePointAPI(pointData.id, pointData.num, pointData.senateMeeting, resolution, Decision))
+         !resolution ? setemptyResolution(true) : (!Decision ?  setemptyDecision(true) : await putSenatePointAPI(pointData.id, pointData.num, pointData.senateMeeting, resolution, Decision, props.token))
         if(resolution && Decision)
         {
             setDecisionDone(true)
             setpoint(0);
-            setResolution();
-            setDecision();
-
+            getdata();
         }
 
 
@@ -60,15 +60,18 @@ const SenateDecisions = () => {
 
 
     const getdata = async () => {
-        const response = await getSenateMeetingAllAPI();
-        const Meeting = response.body;
+        setLoadingL(true)
+
+        console.log("this is senate", props.token);
+        const response = await getSenateMeetingAllAPI(props.token);
+        const Meeting = response.body.results;
         const new_data = []
 
 
 
         for (let i = 0; i < Meeting.length; i++) {
             const pointsArray = []
-            const res2 = await getSenatePointsMeetingIdAPI(Meeting[i].number)
+            const res2 = await getSenatePointsMeetingIdAPI(Meeting[i].number, props.token)
             for (const points of res2.body.senatePoints) {
 
                 pointsArray.push({
@@ -78,6 +81,8 @@ const SenateDecisions = () => {
                     senateMeeting : points.senateMeeting,
                     proposal: points.proposal,
                     resolution: points.resolution,
+                    approvalComplete : points.approvalComplete,
+                    approved : points.approved
                 })
             }
 
@@ -90,6 +95,7 @@ const SenateDecisions = () => {
         };
 
         console.log(new_data);
+        setLoadingL(false)
         setdata(new_data)
 
     }
@@ -126,9 +132,17 @@ const SenateDecisions = () => {
                     <h2>Agendas</h2>
                     <ul className="list-group">
                         {
-                            data?.map((val) => {
+                            !loadingL ? data?.map((val) => {
                                 return <li data-active={agenda === val.num} onClick={handleAgendaClick} className="list-item agenda clickable" data-target={"agenda_" + val.num}>{val.name}</li>
-                            })
+                            }) :
+                            <>
+                                <Placeholder as="p" animation="glow">
+                                    <Placeholder xs={12} />
+                                </Placeholder>
+                                <Placeholder as="p" animation="wave">
+                                    <Placeholder xs={12} />
+                                </Placeholder>
+                            </>
                         }
                     </ul>
                 </div>
@@ -155,19 +169,22 @@ const SenateDecisions = () => {
                                                 {
                                                     det.subpoints.map((sp) => {
                                                         return (
-                                                            <li data-active={point === det.num} onClick={this.handlePointClick} className="list-item agenda-point clickable" data-target={"agenda-pt_" + sp.num}>Handbook Sub Point {sp.num}</li>
+                                                            <li data-active={point === sp.id} onClick={this.handlePointClick} className="list-item agenda-point clickable" data-target={"agenda-pt_" + sp.id}>Handbook Sub Point {sp.num}</li>
                                                         )
                                                     })
                                                 }
                                             </Collapsible>)
 
-                                            : <li data-active={point === det.num} onClick={(e) => {
+                                            : <li data-active={point === det.id} onClick={(e) => {
                                                 setpoint(Number(e.target.dataset.target.split("_").slice(-1)))
                                                 setpointData(det);
+                                                setResolution(det.resolution)
+                                                setDecision(1)
+                                                
 
                                                 console.log("agenda, point", agenda, point)
                                                 console.log("data", det)
-                                            }} className="list-item agenda-point clickable" data-target={"agenda-pt_" + det.num}>{det.proposal}</li>
+                                            }} className="list-item agenda-point clickable" data-target={"agenda-pt_" + det.id}>{det.proposal}</li>
 
                                     )
                                 })}
@@ -182,7 +199,7 @@ const SenateDecisions = () => {
 
 
 
-                <div className="col-sm-6 changes-data pt-5">
+                <div className="col-sm-6 changes-data right-pane">
 
                     {
                         (point === 0 ? (agenda === 0 ?
@@ -217,10 +234,10 @@ const SenateDecisions = () => {
                                     <FormControl sx={{ m: 1, minWidth: 120 }}>
                                         <InputLabel id="demo-simple-select-label">Decision</InputLabel>
                                         <Select
+                                        defaultValue={pointData.approved + 1}
                                             labelId="demo-simple-select-label"
                                             id="demo-simple-select"
-                                            value={Decision}
-                                            label="Age"
+                                            label="Decision"
                                             onChange={(e) => { setDecision(e.target.value) }}
                                         >
                                             <MenuItem value={1}>Approved</MenuItem>
@@ -233,12 +250,14 @@ const SenateDecisions = () => {
                                 </div>
 
                                 <label for="sen_dec_res" class="form-label">Resolution</label>
-                                <textarea type="text" class="form-control" id="sen_dec_res" placeholder={pointData.resolution} onChange={(e) => { setResolution(e.target.value) }}></textarea>
+                                <textarea type="text" class="form-control" id="sen_dec_res" defaultValue = {pointData.resolution} onChange={(e) => { setResolution(e.target.value) }}></textarea>
 
 
                                 
 
-                                <button className="btn btn-success" onClick={handleSubmit}>Submit</button>
+                                <div>
+                                    <button className="btn btn-success" onClick={handleSubmit}><TiTick/> Submit</button>
+                                </div>
                             </form>
 
                             

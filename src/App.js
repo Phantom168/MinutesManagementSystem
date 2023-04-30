@@ -4,29 +4,35 @@ import Agenda from "./pages/agenda";
 import SenateDecisions from "./pages/senateDecisions";
 import UpdateHandbook from "./pages/updateHandbook";
 import Login from "./pages/login";
+import GoogleLogin from "./pages/GoogleLogin";
+import 'bootstrap/dist/css/bootstrap.css';
 
-import { Routes, Route, Outlet, Link, NavLink } from "react-router-dom";
+
+import { Routes, Route, Outlet, Link, NavLink, Navigate } from "react-router-dom";
 
 
 
 export default function App() {
   const [loginStatus, setLoginStatus] = useState(false);
+  const [token, setToken] = useState(false);
+  
   return (
-    loginStatus ? 
-      (<Routes>
-        <Route path="/" element={<Layout />}>
-          <Route path="home" index element={<Home />} />
-          <Route path="agenda" element={<Agenda />} />
-          <Route path="senateDecisions" element={<SenateDecisions />} />
-          <Route path="updateHandbook" element={<UpdateHandbook />} />
+<Routes>
+        {/* <Route path="/" element={loginStatus ? <Layout /> : <Navigate to="/login" />}/> */}
+        <Route path="/login" element={loginStatus ?  <Navigate to="/" /> : <Login />}/>
+        <Route path="/accounts" element = {<GoogleLogin setLoginStatus= {setLoginStatus} setToken = {setToken}/>}/>
 
+        <Route path="/" element={loginStatus ? <Layout /> : <Navigate to="/login" />}>
+          <Route path="home" index element={loginStatus ? <Home token = {token}/> : <Navigate to="/login" />} />
+          <Route path="agenda" element={loginStatus ? <Agenda token = {token}/> : <Navigate to="/login" />} />
+          <Route path="senateDecisions" element={loginStatus ? <SenateDecisions token = {token}/> : <Navigate to="/login" />} />
+          <Route path="updateHandbook" element={loginStatus ? <UpdateHandbook token = {token}/> : <Navigate to="/login" />} />
+          </Route>
           {/* Using path="*"" means "match anything", so this route
                 acts like a catch-all for URLs that we don't have explicit
                 routes for. */}
           {/* <Route path="*" element={<NoMatch />} /> */}
-        </Route>
-      </Routes>) :
-      <Login/>
+      </Routes>
   );
 }
 
@@ -59,7 +65,7 @@ function Layout() {
                 </li>
   
               </ul>
-                <button className="btn logout btn-outline my-2 my-sm-0" type="submit">Logout</button>
+                <button className="btn logout btn-outline my-2 my-sm-0" type="submit" onClick={() => {window.location.reload()}}>Logout</button>
             </div>
           </nav>
 

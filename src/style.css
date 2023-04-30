@@ -1,3 +1,18 @@
+html::-webkit-scrollbar {
+    width: 10px !important;
+}
+
+html::-webkit-scrollbar-track {
+    border-radius: 8px!important;
+    background-color: #e7e7e7!important;
+    border: 1px solid #cacaca!important;
+}
+
+html::-webkit-scrollbar-thumb {
+    border-radius: 8px!important;
+    background-color: #d55959!important;
+}
+
 li{
     list-style-type: none;
 }
@@ -6,24 +21,32 @@ li{
     background-color: #f9a61b !important;
 }
 
+#navbar>div.navbar-collapse#navbarSupportedContent{
+    justify-content: space-between;
+}
+
+#navbar>div.navbar-collapse#navbarSupportedContent>button{
+    margin:0 15px;
+}
+
 #navbar .nav-link{
     border-radius:10px;
     margin:0 5px;
 }
 
-#navbar .nav-link:hover{
+/* #navbar .nav-link:hover{
     background-color:#f48120 !important;
 }
 
 #navbar .nav-link.active{
     background-color:#f05a25 !important;
     
-}
+} */
 
 
 #navbar button.logout{
-    background-color:yellow;
-}
+    background-color:rgba(255,203,4,0.75);
+} 
 
 #navbar button.logout:hover{
     box-shadow: 0 5px 5px rgba(0,0,0,0.25), 0 5px 5px rgba(0,0,0,0.22);
@@ -47,10 +70,25 @@ li{
 div.left-pane, div.center-pane, div.right-pane{
     display: flex;
     flex-direction: column;
-    padding-top:15px;
-    padding-left:40px;
+    padding: 25px 25px 0 25px;
+   
     border-right: 1px black dashed;
-    overflow: scroll;
+    overflow: auto;
+}
+
+div.right-pane>div{
+    width:75%;
+    margin:0 auto;
+}
+
+div.right-pane.changes-data>div>div>button , div.right-pane.changes-data>div>h2, .point_history_tile{
+    margin-bottom:1rem;
+}
+
+
+
+div.center-pane>button{
+    margin-bottom:1rem;
 }
 
 h5.placeholder-tile{
@@ -61,10 +99,7 @@ div.agenda-menu, div.agenda-submenu{
     /* padding-top:0; */
 }
 
-div.right-pane{
-    padding-top:40px;
-    width:75%;
-}
+
 
 li.clickable {
     padding:10px;
@@ -75,13 +110,11 @@ li.clickable {
 
 li.clickable:hover {
     cursor: pointer;
-    background-color: darkgray;
+    background-color: rgba(255,203,4,0.5);;
 }
 
 div.point_history_tile{
-    width:75%;
-    margin:auto;
-    margin-bottom: 3rem;;
+   
 }
 
 div.point_history_tile>h5{
@@ -92,20 +125,39 @@ div.point_history_tile>p{
 
 }
 
-div.changes-data{
-    padding-top:15px;
+
+
+
+
+.ag_pt_new{
+    width: 75%;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
 }
 
-div.changes-data>h2{
-    width:75%;
-    margin:auto;
-    margin-bottom: 20px;
+.ag_pt_new input, .ag_pt_new textarea{
+    margin: 10px 0;
 }
 
+.ag_pt_new>div{
+    margin: auto;;
+}
 
-form.sen_dec_form, form.ag_pt_create_form, form.ag_pt_view, form.up_hb_form{
-    width:75%;
-    margin:auto;
+.ag_pt_new>div>button{
+    margin:10px 10px;
+}
+
+form.ag_pt_view{
+
+}
+
+form.ag_pt_view>input{
+    margin-bottom:1rem;
+}
+
+form.sen_dec_form, form.up_hb_form, div.right-pane.changes-data>div.ag_pt_new, form.ag_pt_view{
+    margin-top:48px;
 }
 
 form.sen_dec_form>div, form.up_hb_form>div.boxing-div, form.ag_pt_create_form>div, form.ag_pt_view>div{
@@ -114,7 +166,7 @@ form.sen_dec_form>div, form.up_hb_form>div.boxing-div, form.ag_pt_create_form>di
     padding: 1rem 0;
 }
 
-form.sen_dec_form .btn,form.ag_pt_create_form .btn,form.ag_pt_view .btn,form.up_hb_form>div.boxing-div>*, .up_hb_menu>div>.btn{
+form.sen_dec_form .btn,form.ag_pt_create_form .btn,form.up_hb_form>div.boxing-div>*, .up_hb_menu>div>.btn{
     margin: 1rem 1rem;
 }
 
@@ -135,7 +187,7 @@ form.up_hb_form input, form.sen_dec_form input{
 }
 
 li.clickable[data-active="true"]{
-    background:lightgray;
+    background:rgba(255,203,4,0.75);;
 }
 
 .agenda-submenu .btn-group, .senate-submenu .btn-group{
@@ -190,4 +242,23 @@ li.clickable[data-active="true"]{
 
   .login-cont>button{
     margin: auto;
+  }
+
+  .navbar .navbar-nav .nav-item {
+    position: relative;
+  }
+  .navbar .navbar-nav .nav-item>.nav-link::after {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    content: "";
+    background-color: rgba(244, 129, 32, 1);
+    width: 0%;
+    height: 4px;
+    transition: all 0.5s;
+  }
+  .navbar .navbar-nav .nav-item>.nav-link:hover::after , .navbar .navbar-nav .nav-item>.nav-link.active::after {
+    width: 100%;
   }

@@ -1,21 +1,27 @@
 import React, { useEffect, useState } from "react";
 import Collapsible from "react-collapsible";
-
+import {AiTwotoneDelete} from "react-icons/ai";
+import {TfiAgenda} from "react-icons/tfi";
+import {GiCancel} from "react-icons/gi";
+import {FaRegFilePowerpoint} from "react-icons/fa";
+import {IoCreateOutline} from "react-icons/io5";
 import { getSenateMeetingAllAPI, getSenatePointsMeetingIdAPI, addSenateMeetingAPI, addSenatePointAPI } from '../api/senateMeeting'
+import 'bootstrap/dist/css/bootstrap.css';
+
+import { deleteSenateAgendaAPI,  deleteSenatePointAPI} from '../api/senateMeeting'
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
-
+import Placeholder from 'react-bootstrap/Placeholder';
 import FormControl from '@mui/material/FormControl';
 import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
 
 
 
 
-const Agenda = () => {
+const Agenda = (props) => {
     const [data, setdata] = useState();
     const [agenda, setagenda] = useState(0);
     const [point, setpoint] = useState(0);
@@ -29,7 +35,11 @@ const Agenda = () => {
     const [emptyMeetingNumber, setemptyMeetingNumber] = useState(false);
     const [meetingCreated, setmeetingCreated] = useState(false);
     const [openModal, setopenModal] = useState(false);
+    const [loadingL, setLoadingL] = useState(true);
 
+    const [openDeleteAgenda, setopenDeleteAgenda] = useState(false);
+    const [openDeletePoint, setopenDeletePoint] = useState(false);
+    
     const [emptyAnnoucement, setemptyAnnoucement] =useState(false)
     const [announcement, setannouncement] = useState()
 
@@ -53,7 +63,7 @@ const Agenda = () => {
         console.log("meetingNumber", meetingNumber)
         if (meetingNumber && announcement)
         {
-            await addSenateMeetingAPI(meetingNumber, announcement)
+            await addSenateMeetingAPI(meetingNumber, announcement, props.token)
             setmeetingCreated(true);
             handleModalClose()
             getdata();
@@ -77,7 +87,7 @@ const Agenda = () => {
 
 
     const handleNewPoint = async () => {
-        await addSenatePointAPI(number, name, proposal, agenda);
+        await addSenatePointAPI(number, name, proposal, agenda, props.token);
         setnewpointCreated(true);
         getdata();
         setNewPoint(false)
@@ -85,17 +95,32 @@ const Agenda = () => {
 
     }
 
+    const handleDeleteAgenda = async() => {
+        await deleteSenateAgendaAPI(agenda, props.token);
+        getdata();
+        setopenDeleteAgenda(true);
+    }
+
+    const handleDeletePoint = async(e) => {
+        e.preventDefault();
+        await deleteSenatePointAPI(point, props.token);
+        getdata();
+        setopenDeletePoint(true);
+    }
+
+
 
     const getdata = async () => {
-        const response = await getSenateMeetingAllAPI();
-        const Meeting = response.body;
+        setLoadingL(true);
+        const response = await getSenateMeetingAllAPI(props.token);
+        const Meeting = response.body.results;
         const new_data = []
 
 
 
         for (let i = 0; i < Meeting.length; i++) {
             const pointsArray = []
-            const res2 = await getSenatePointsMeetingIdAPI(Meeting[i].number)
+            const res2 = await getSenatePointsMeetingIdAPI(Meeting[i].number, props.token)
             for (const points of res2.body.senatePoints) {
                 // const changes = []
                 // console.log("points", points)
@@ -115,6 +140,7 @@ const Agenda = () => {
                 pointsArray.push({
                     num: points.number,
                     name: points.name,
+                    id: points.id,
                     proposal: points.proposal,
                     resolution: points.resolution,
                     has_subpoints: false
@@ -131,6 +157,8 @@ const Agenda = () => {
 
         console.log(new_data);
         setdata(new_data)
+        setLoadingL(false)
+        console.log(new_data);
 
     }
 
@@ -199,24 +227,43 @@ const Agenda = () => {
                 </Alert>
             </Snackbar>
 
-
-
             <Snackbar open={meetingCreated} autoHideDuration={6000} onClose={() => { setmeetingCreated(false); }}>
                 <Alert onClose={() => { setmeetingCreated(false); }} severity="success" sx={{ width: '100%' }}>
-                    New Senate Agenda Created!
+                    New Agenda Meeting Created!
+                </Alert>
+            </Snackbar>
+
+
+            <Snackbar open={openDeleteAgenda} autoHideDuration={6000} onClose={() => { setopenDeleteAgenda(false); }}>
+                <Alert onClose={() => { setopenDeleteAgenda(false); }} severity="success" sx={{ width: '100%' }}>
+                    Senate Agenda Deleted!
+                </Alert>
+            </Snackbar>
+
+            <Snackbar open={openDeletePoint} autoHideDuration={6000} onClose={() => { setopenDeletePoint(false); }}>
+                <Alert onClose={() => { setopenDeletePoint(false); }} severity="success" sx={{ width: '100%' }}>
+                Senate Agenda Point Deleted!
                 </Alert>
             </Snackbar>
 
 
             <div className="agenda-cont">
                 <div className="col-sm-3 agenda-menu left-pane">
-                    <button className="btn mb-3" data-target="create-agenda" onClick={() => setopenModal(true)}>Create New Agenda</button>
+                    <button className="btn btn-primary mb-3" data-target="create-agenda" onClick={() => setopenModal(true)}><TfiAgenda/> Create New Agenda</button>
                     <h2>Agendas</h2>
                     <ul className="list-group">
                         {
-                            data?.map((val) => {
+                            !loadingL ? data?.map((val) => {
                                 return <li data-active={agenda === val.num} onClick={handleAgendaClick} className="list-item agenda clickable" data-target={"agenda_" + val.num}>{val.name}</li>
-                            })
+                            }) :
+                            <>
+                                <Placeholder as="p" animation="glow">
+                                    <Placeholder xs={12} />
+                                </Placeholder>
+                                <Placeholder as="p" animation="wave">
+                                    <Placeholder xs={12} />
+                                </Placeholder>
+                            </>
                         }
                     </ul>
                 </div>
@@ -231,8 +278,8 @@ const Agenda = () => {
                         <Dropdown.Item eventKey="3">Rename Selected Agenda</Dropdown.Item>
                     </DropdownButton> */}
 
-                        <button className="btn btn-primary mb-3" data-target="create-agenda" onClick={() => { setNewPoint(true) }}>New Agenda Point</button>
-                        <button className="btn btn-danger mb-3" data-target="create-agenda" >Delete Agenda</button>
+                        <button className="btn btn-primary mb-3" data-target="create-agenda" onClick={() => { setNewPoint(true) }}><FaRegFilePowerpoint/> New Agenda Point</button>
+                        <button className="btn btn-danger mb-3" data-target="create-agenda" onClick={handleDeleteAgenda}><AiTwotoneDelete/>  Delete Agenda</button>
 
                         <h2>Agenda Points</h2></React.Fragment>}
                     {data?.map((val, id) => {
@@ -246,18 +293,18 @@ const Agenda = () => {
                                                 {
                                                     det.subpoints.map((sp) => {
                                                         return (
-                                                            <li data-active={point === det.num} onClick={this.handlePointClick} className="list-item agenda-point clickable" data-target={"agenda-pt_" + sp.num}>Handbook Sub Point {sp.num}</li>
+                                                            <li data-active={point === sp.id} onClick={this.handlePointClick} className="list-item agenda-point clickable" data-target={"agenda-pt_" + sp.id}>Handbook Sub Point {sp.num}</li>
                                                         )
                                                     })
                                                 }
                                             </Collapsible>)
 
-                                            : <li data-active={point === det.num} onClick={(e) => {
+                                            : <li data-active={point === det.id} onClick={(e) => {
                                                 setpoint(Number(e.target.dataset.target.split("_").slice(-1)))
                                                 setpointData(det);
                                                 console.log("agenda, point", agenda, point)
                                                 console.log("data", det)
-                                            }} className="list-item agenda-point clickable" data-target={"agenda-pt_" + det.num}>{det.proposal}</li>
+                                            }} className="list-item agenda-point clickable" data-target={"agenda-pt_" + det.id}>{det.proposal}</li>
 
                                     )
                                 })}
@@ -272,10 +319,10 @@ const Agenda = () => {
 
 
 
-                <div className="col-sm-6 changes-data pt-5">
+                <div className="col-sm-6 right-pane changes-data">
                     {
                         NewPoint && (
-                            <div>
+                            <div className="ag_pt_new">
 
                                 <label for="ag_pt_new_prop" class="form-label">Proposal</label>
                                 <input type="number" class="form-control" id="ag_pt_new_prop" placeholder="Enter point number" onChange={(e) => { setnumber(e.target.value) }}></input>
@@ -284,8 +331,8 @@ const Agenda = () => {
                                 <textarea type="text" class="form-control" id="ag_pt_new_prop" placeholder="Proposal for the Agenda Point" onChange={(e) => { setproposal(e.target.value) }}></textarea>
 
                                 <div>
-                                    <button className="btn btn-success" onClick={handleNewPoint} >Create</button>
-                                    <button className="btn btn-danger" onClick={() => { setNewPoint(false) }}>Cancel</button>
+                                    <button className="btn btn-success" onClick={handleNewPoint} ><IoCreateOutline/> Create</button>
+                                    <button className="btn btn-danger" onClick={() => { setNewPoint(false) }}><GiCancel/> Cancel</button>
                                 </div>
                             </div>
                         )
@@ -303,7 +350,12 @@ const Agenda = () => {
                                 <label for="ag_pt_view_prop" class="form-label">Proposal</label>
                                 <input readOnly={true} type="text" class="form-control" id="ag_pt_view_prop" placeholder={pointData.name} ></input>
                                 <input readOnly={true} type="text" class="form-control" id="ag_pt_view_prop" placeholder={pointData.proposal}></input>
-                                <button className="btn btn-danger">Delete Point</button>
+
+                                <div>
+   
+                                    <button className="btn btn-danger" onClick={handleDeletePoint}><AiTwotoneDelete/> Delete Point</button>
+                                </div>
+
 
                             </form>
 
