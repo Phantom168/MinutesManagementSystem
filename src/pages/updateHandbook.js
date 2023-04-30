@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import Collapsible from "react-collapsible";
 import HandbookPDFTemplate from "./utils/HandbookPDFTemplate";
+import {TiTick} from "react-icons/ti";
+import {MdPreview, MdPublish} from "react-icons/md";
 import { Editor } from "react-draft-wysiwyg";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import { EditorState, convertToRaw, ContentState, convertFromHTML } from "draft-js";
@@ -298,7 +300,7 @@ const handlePublish = async(e) => {
                         }, [pdfRef.current])}
                         documentTitle="AwesomeFileName"
                         trigger={React.useCallback(()=>{
-                            return <button className="btn btn-primary">Preview Handbook</button>
+                            return <button className="btn btn-primary"><MdPreview/> Preview Handbook</button>
                         },[])}
                     />
                     {console.log(HandbookData)}
@@ -307,7 +309,7 @@ const handlePublish = async(e) => {
                     </div>
 
 
-                    <button className="btn btn-primary" onClick={handlePublish}>Publish Handbook</button>
+                    <button className="btn btn-primary" onClick={handlePublish}><MdPublish/> Publish Handbook</button>
                     <h2>Senate Decisions</h2>
                     <ul className="list-group">
                         {
@@ -472,7 +474,7 @@ const handlePublish = async(e) => {
 
 
                                 <div className="boxing-div">
-                                    <button className="btn btn-success" onClick={handleSubmit}>Create</button>
+                                    <button className="btn btn-success" onClick={handleSubmit}><TiTick/> Create</button>
                                 </div>
                             </form>
 

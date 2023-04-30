@@ -1,8 +1,14 @@
 import React, { useEffect, useState } from "react";
 import Collapsible from "react-collapsible";
+import {AiTwotoneDelete} from "react-icons/ai";
+import {TfiAgenda} from "react-icons/tfi";
+import {GiCancel} from "react-icons/gi";
+import {FaRegFilePowerpoint} from "react-icons/fa";
+import {IoCreateOutline} from "react-icons/io5";
+import { getSenateMeetingAllAPI, getSenatePointsMeetingIdAPI, addSenateMeetingAPI, addSenatePointAPI } from '../api/senateMeeting'
 import 'bootstrap/dist/css/bootstrap.css';
 
-import { getSenateMeetingAllAPI, getSenatePointsMeetingIdAPI, addSenateMeetingAPI, addSenatePointAPI, deleteSenateAgendaAPI,  deleteSenatePointAPI} from '../api/senateMeeting'
+import { deleteSenateAgendaAPI,  deleteSenatePointAPI} from '../api/senateMeeting'
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import Box from '@mui/material/Box';
@@ -243,7 +249,7 @@ const Agenda = (props) => {
 
             <div className="agenda-cont">
                 <div className="col-sm-3 agenda-menu left-pane">
-                    <button className="btn btn-primary mb-3" data-target="create-agenda" onClick={() => setopenModal(true)}>Create New Agenda</button>
+                    <button className="btn btn-primary mb-3" data-target="create-agenda" onClick={() => setopenModal(true)}><TfiAgenda/> Create New Agenda</button>
                     <h2>Agendas</h2>
                     <ul className="list-group">
                         {
@@ -272,8 +278,8 @@ const Agenda = (props) => {
                         <Dropdown.Item eventKey="3">Rename Selected Agenda</Dropdown.Item>
                     </DropdownButton> */}
 
-                        <button className="btn btn-primary mb-3" data-target="create-agenda" onClick={() => { setNewPoint(true) }}>New Agenda Point</button>
-                        <button className="btn btn-danger mb-3" data-target="create-agenda" onClick={handleDeleteAgenda}>Delete Agenda</button>
+                        <button className="btn btn-primary mb-3" data-target="create-agenda" onClick={() => { setNewPoint(true) }}><FaRegFilePowerpoint/> New Agenda Point</button>
+                        <button className="btn btn-danger mb-3" data-target="create-agenda" onClick={handleDeleteAgenda}><AiTwotoneDelete/>  Delete Agenda</button>
 
                         <h2>Agenda Points</h2></React.Fragment>}
                     {data?.map((val, id) => {
@@ -325,8 +331,8 @@ const Agenda = (props) => {
                                 <textarea type="text" class="form-control" id="ag_pt_new_prop" placeholder="Proposal for the Agenda Point" onChange={(e) => { setproposal(e.target.value) }}></textarea>
 
                                 <div>
-                                    <button className="btn btn-success" onClick={handleNewPoint} >Create</button>
-                                    <button className="btn btn-danger" onClick={() => { setNewPoint(false) }}>Cancel</button>
+                                    <button className="btn btn-success" onClick={handleNewPoint} ><IoCreateOutline/> Create</button>
+                                    <button className="btn btn-danger" onClick={() => { setNewPoint(false) }}><GiCancel/> Cancel</button>
                                 </div>
                             </div>
                         )
@@ -346,7 +352,8 @@ const Agenda = (props) => {
                                 <input readOnly={true} type="text" class="form-control" id="ag_pt_view_prop" placeholder={pointData.proposal}></input>
 
                                 <div>
-                                    <button className="btn btn-danger" onClick={handleDeletePoint}>Delete Point</button>
+   
+                                    <button className="btn btn-danger" onClick={handleDeletePoint}><AiTwotoneDelete/> Delete Point</button>
                                 </div>
 
 

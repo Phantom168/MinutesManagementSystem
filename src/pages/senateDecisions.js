@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Collapsible from "react-collapsible";
-
+import {TiTick} from "react-icons/ti";
 import { getSenateMeetingAllAPI, getSenatePointsMeetingIdAPI, putSenatePointAPI} from '../api/senateMeeting'
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
@@ -256,7 +256,7 @@ const SenateDecisions = (props) => {
                                 
 
                                 <div>
-                                    <button className="btn btn-success" onClick={handleSubmit}>Submit</button>
+                                    <button className="btn btn-success" onClick={handleSubmit}><TiTick/> Submit</button>
                                 </div>
                             </form>
 
