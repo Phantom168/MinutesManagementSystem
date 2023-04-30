@@ -11,7 +11,7 @@ li{
     margin:0 5px;
 }
 
-#navbar .nav-link:hover{
+/* #navbar .nav-link:hover{
     background-color:#f48120 !important;
 }
 
@@ -23,7 +23,7 @@ li{
 
 #navbar button.logout{
     background-color:yellow;
-}
+} */
 
 #navbar button.logout:hover{
     box-shadow: 0 5px 5px rgba(0,0,0,0.25), 0 5px 5px rgba(0,0,0,0.22);
@@ -75,7 +75,7 @@ li.clickable {
 
 li.clickable:hover {
     cursor: pointer;
-    background-color: darkgray;
+    background-color: rgba(255,203,4,0.5);;
 }
 
 div.point_history_tile{
@@ -102,6 +102,24 @@ div.changes-data>h2{
     margin-bottom: 20px;
 }
 
+.ag_pt_new{
+    width: 75%;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.ag_pt_new input, .ag_pt_new textarea{
+    margin: 10px 0;
+}
+
+.ag_pt_new>div{
+    margin: auto;;
+}
+
+.ag_pt_new>div>button{
+    margin:10px 10px;
+}
 
 form.sen_dec_form, form.ag_pt_create_form, form.ag_pt_view, form.up_hb_form{
     width:75%;
@@ -135,7 +153,7 @@ form.up_hb_form input, form.sen_dec_form input{
 }
 
 li.clickable[data-active="true"]{
-    background:lightgray;
+    background:rgba(255,203,4,0.75);;
 }
 
 .agenda-submenu .btn-group, .senate-submenu .btn-group{
@@ -190,4 +208,23 @@ li.clickable[data-active="true"]{
 
   .login-cont>button{
     margin: auto;
+  }
+
+  .navbar .navbar-nav .nav-item {
+    position: relative;
+  }
+  .navbar .navbar-nav .nav-item>.nav-link::after {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    content: "";
+    background-color: rgba(244, 129, 32, 1);
+    width: 0%;
+    height: 4px;
+    transition: all 0.5s;
+  }
+  .navbar .navbar-nav .nav-item>.nav-link:hover::after , .navbar .navbar-nav .nav-item>.nav-link.active::after {
+    width: 100%;
   }

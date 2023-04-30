@@ -42,14 +42,15 @@ class Home extends Component {
 
         for (let i = 0; i < section.length; i++) {
             const pointsArray = []
-            const res2 = await getHandbookPointsSectionIdAPI(section[i].number)
+            const res2 = await getHandbookPointsSectionIdAPI(section[i].number);
             for (const points of res2.body.handbookPoints) {
                 const changes = []
                 const versionHistory = points.versionHistory;
+                const pointsId = points.id;
                 if (versionHistory.length === 0) {
                     changes.push({
                         when: "Original Point",
-                        change: points.text
+                        change: points.text,
                     })
                 }
                 for (const version of versionHistory) {
@@ -61,7 +62,8 @@ class Home extends Component {
                 }
                 pointsArray.push({
                     num: points.number,
-                    changes: changes
+                    changes: changes,
+                    id:pointsId,
                 })
             }
 
@@ -75,16 +77,16 @@ class Home extends Component {
 
         };
 
-        console.log(new_data);
-
         this.setState({
             data: new_data
         }, this.forceUpdate())
+
 
     }
 
     async componentWillMount() {
         this.getData();
+
     }
 
     async handleDeleteSection(section, e) {
@@ -158,7 +160,7 @@ class Home extends Component {
                         <ul id={"section_" + id} className="list-group">
                             {val.points?.map((det, id) => {
                                 return (
-                                    <li data-active={this.state.point === det.num} onClick={this.handlePointClick} className="list-item section-point clickable" data-target={"section-pt_" + det.num}>Handbook Point {det.num}</li>
+                                    <li data-active={this.state.point === det.id} onClick={this.handlePointClick} className="list-item section-point clickable" data-target={"section-pt_" + det.id}>Handbook Point {det.num}</li>
                                 )
                             })}
 
@@ -192,6 +194,7 @@ class Home extends Component {
                 })}
 
             </div>
+            {console.log(this.state)}
         </div>);
     }
 }

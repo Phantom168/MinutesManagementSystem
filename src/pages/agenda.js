@@ -115,6 +115,7 @@ const Agenda = () => {
                 pointsArray.push({
                     num: points.number,
                     name: points.name,
+                    id: points.id,
                     proposal: points.proposal,
                     resolution: points.resolution,
                     has_subpoints: false
@@ -131,6 +132,8 @@ const Agenda = () => {
 
         console.log(new_data);
         setdata(new_data)
+
+        console.log(new_data);
 
     }
 
@@ -246,18 +249,18 @@ const Agenda = () => {
                                                 {
                                                     det.subpoints.map((sp) => {
                                                         return (
-                                                            <li data-active={point === det.num} onClick={this.handlePointClick} className="list-item agenda-point clickable" data-target={"agenda-pt_" + sp.num}>Handbook Sub Point {sp.num}</li>
+                                                            <li data-active={point === sp.id} onClick={this.handlePointClick} className="list-item agenda-point clickable" data-target={"agenda-pt_" + sp.id}>Handbook Sub Point {sp.num}</li>
                                                         )
                                                     })
                                                 }
                                             </Collapsible>)
 
-                                            : <li data-active={point === det.num} onClick={(e) => {
+                                            : <li data-active={point === det.id} onClick={(e) => {
                                                 setpoint(Number(e.target.dataset.target.split("_").slice(-1)))
                                                 setpointData(det);
                                                 console.log("agenda, point", agenda, point)
                                                 console.log("data", det)
-                                            }} className="list-item agenda-point clickable" data-target={"agenda-pt_" + det.num}>{det.proposal}</li>
+                                            }} className="list-item agenda-point clickable" data-target={"agenda-pt_" + det.id}>{det.proposal}</li>
 
                                     )
                                 })}
@@ -275,7 +278,7 @@ const Agenda = () => {
                 <div className="col-sm-6 changes-data pt-5">
                     {
                         NewPoint && (
-                            <div>
+                            <div className="ag_pt_new">
 
                                 <label for="ag_pt_new_prop" class="form-label">Proposal</label>
                                 <input type="number" class="form-control" id="ag_pt_new_prop" placeholder="Enter point number" onChange={(e) => { setnumber(e.target.value) }}></input>

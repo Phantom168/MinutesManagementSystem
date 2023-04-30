@@ -155,19 +155,19 @@ const SenateDecisions = () => {
                                                 {
                                                     det.subpoints.map((sp) => {
                                                         return (
-                                                            <li data-active={point === det.num} onClick={this.handlePointClick} className="list-item agenda-point clickable" data-target={"agenda-pt_" + sp.num}>Handbook Sub Point {sp.num}</li>
+                                                            <li data-active={point === sp.id} onClick={this.handlePointClick} className="list-item agenda-point clickable" data-target={"agenda-pt_" + sp.id}>Handbook Sub Point {sp.num}</li>
                                                         )
                                                     })
                                                 }
                                             </Collapsible>)
 
-                                            : <li data-active={point === det.num} onClick={(e) => {
+                                            : <li data-active={point === det.id} onClick={(e) => {
                                                 setpoint(Number(e.target.dataset.target.split("_").slice(-1)))
                                                 setpointData(det);
 
                                                 console.log("agenda, point", agenda, point)
                                                 console.log("data", det)
-                                            }} className="list-item agenda-point clickable" data-target={"agenda-pt_" + det.num}>{det.proposal}</li>
+                                            }} className="list-item agenda-point clickable" data-target={"agenda-pt_" + det.id}>{det.proposal}</li>
 
                                     )
                                 })}
