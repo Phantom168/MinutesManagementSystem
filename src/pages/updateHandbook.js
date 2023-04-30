@@ -1,9 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Collapsible from "react-collapsible";
+import HandbookPDFTemplate from "./utils/HandbookPDFTemplate";
 import { Editor } from "react-draft-wysiwyg";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import { EditorState, convertToRaw, ContentState, convertFromHTML } from "draft-js";
 import draftToHtml from 'draftjs-to-html';
+import Button from '@mui/material/Button';
+import Modal from '@mui/material/Modal';
+import Box from '@mui/material/Box';
 import { getHandbookSectionAPI, getHandbookPointsSectionIdAPI, getHandbookPointsIdAPI } from '../api/handbook'
 import {publishHandbookAPI, updateHandbookPointAPI} from '../api/UpdateHandbook'
 import 'bootstrap/dist/css/bootstrap.css';
@@ -15,8 +19,67 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import TextField from '@mui/material/TextField';
-
 import Select from '@mui/material/Select';
+import jsPDF from 'jspdf';
+import Placeholder from 'react-bootstrap/Placeholder';
+import ReactToPrint, {useReactToPrint } from "react-to-print";
+var parse = require('html-react-parser');
+
+
+export function PdfTemplate(props){
+    const hb = props.hb
+    const styles = {
+        page:{
+            width:"75%",
+            margin:"auto",
+            padding:"96px 0"
+        },
+        section:{
+            color:"#7030a0",
+            margin:"auto",
+            marginBottom:"10px",
+        },
+        section_cont:{
+            textAlign:"center"
+        },
+        sub_heading:{
+            color:"#7030a0",
+        },
+        pt_content:{
+            marginBottom:"48px",
+        },
+        pt_content_for_last_pt:{
+            marginBottom:"96px",
+        }
+    }
+
+
+
+
+    return (<div className="hb-pdf" style={styles.page} >
+        {
+            hb.map((section, sec_idx) => {
+                return (<div>
+                    <div style={styles.section_cont}>
+                        <h5 style={styles.section}>{section.name}</h5>
+                    </div>
+                    {section.points.map((pt, pt_idx) => {
+                        return (<>
+                                    <h6 style={styles.sub_heading}>{sec_idx + 1}.{pt_idx +1}</h6>
+                                    <p style={pt_idx !== section.points.length -1 ? 
+                                        styles.pt_content : 
+                                        styles.pt_content_for_last_pt}>
+                                    {parse(pt.text)}</p>
+                            </>);
+                    })}
+                </div>)
+                })
+        }
+    
+    </div>)
+    
+}
+
 
 var parse = require('html-react-parser');
 
@@ -35,6 +98,9 @@ const UpdateHandbook = () => {
     const [emptyHandbookPoint, setemptyHandbookPoint] = useState(false);
     const [HandbookPointUpdated, setHandbookPointUpdated] = useState(false);
     const [HandbooknewText, setHandbooknewText] = useState(false);
+    const [show, setShow] = useState(false)
+    const pdfRef = useRef(null);
+    const [loadingL, setLoadingL] = useState(true);
 
 const handleSubmit = async(e) => {
     e.preventDefault();
@@ -73,9 +139,11 @@ const handlePublish = async(e) => {
         setpoint(0);
     }
 
+    const handleClose = () => setShow(false)
 
 
     const getdata = async () => {
+        setLoadingL(true);
         const response = await getSenateMeetingAllAPI();
         const Meeting = response.body.results;
         const new_data = []
@@ -129,15 +197,56 @@ const handlePublish = async(e) => {
 
         console.log("newhandbookData", newhandbookData)
         setdata(new_data);
+        setLoadingL(false)
         setHandbookData(newhandbookData)
 
+        
 
     }
+
+
+    function sleep(milliseconds) {
+        const date = Date.now();
+        let currentDate = null;
+        do {
+          currentDate = Date.now();
+        } while (currentDate - date < milliseconds);
+      }
+    
+
+    const createPDF = (myRef) => {
+
+        const doc = new jsPDF();
+        // setShow(true);
+        doc.html(myRef.current, {
+            async callback(doc) {
+                await doc.save('pdf_name');
+            },
+        });
+    }
+
+
+    const handlePrint = useReactToPrint({
+        content: () => pdfRef.current,
+      });
+    
+
+
+    // const getHandbookData = async () => {
+    //     const res = await getHandbookPointsAPI();
+    //     const body = res.body;
+    //     console.log("tetdfgdfg",res,body);
+    // }
+
+
+
+    
 
 
 
     useEffect(() => {
         getdata();
+        
     }, [])
 
     const getPointDataHTML= async(handbookPoint) => {
@@ -184,14 +293,37 @@ const handlePublish = async(e) => {
 
             <div className="up_hb_cont">
                 <div className="col-sm-3 up_hb_menu left-pane">
-                    <button className="btn btn-primary">Preview Handbook</button>
+                    {/* <button className="btn btn-primary" onClick={() => {setShow(true)}}>Preview Handbook</button> */}
+                    <ReactToPrint
+                        content={React.useCallback(() => {
+                            return pdfRef.current;
+                        }, [pdfRef.current])}
+                        documentTitle="AwesomeFileName"
+                        trigger={React.useCallback(()=>{
+                            return <button className="btn btn-primary">Preview Handbook</button>
+                        },[])}
+                    />
+                    {console.log(HandbookData)}
+                    <div style={{display:"none"}}>
+                        {HandbookData && <HandbookPDFTemplate ref={pdfRef} hb={HandbookData} />}
+                    </div>
+
+
                     <button className="btn btn-primary" onClick={handlePublish}>Publish Handbook</button>
                     <h2>Senate Decisions</h2>
                     <ul className="list-group">
                         {
-                            data?.map((val) => {
+                            !loadingL ? data?.map((val) => {
                                 return <li data-active={agenda === val.num} onClick={handleAgendaClick} className="list-item agenda clickable" data-target={"agenda_" + val.num}>{val.name}</li>
-                            })
+                            }) :
+                            <>
+                                <Placeholder as="p" animation="glow">
+                                    <Placeholder xs={12} />
+                                </Placeholder>
+                                <Placeholder as="p" animation="wave">
+                                    <Placeholder xs={12} />
+                                </Placeholder>
+                            </>
                         }
                     </ul>
                 </div>
@@ -245,8 +377,8 @@ const handlePublish = async(e) => {
 
 
 
-                <div className="col-sm-6 changes-data pt-5">
-
+                <div className="col-sm-6 changes-data right-pane">
+                
                     {
                         (point === 0 ? (agenda === 0 ?
                             <h5 className="placeholder-tile">Select senate point to edit the handbook</h5>
@@ -363,13 +495,32 @@ const handlePublish = async(e) => {
 
                 </div>
 
-
-
-
-
-
-
             </div>
+
+            {/* <Modal open={show} onHide={handleClose}>
+                
+                <>
+                <Button onClick={handleClose}>Close</Button>
+                <ReactToPrint
+                    content={React.useCallback(() => {
+                        return pdfRef.current;
+                      }, [pdfRef.current])}
+                    documentTitle="AwesomeFileName"
+                    onAfterPrint={React.useCallback(() => {
+                        setShow(false)
+                      }, [])}
+                    // onBeforeGetContent={handleOnBeforeGetContent}
+                    // onBeforePrint={React.useCallback(() => {
+                    //     setShow()
+                    //   }, []);}
+                    trigger={React.useCallback(()=>{
+                        return <button>Print</button>
+                    },[])}
+                />
+               
+                    
+               
+            </Modal>  */}
         </>
     )
 

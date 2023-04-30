@@ -8,7 +8,7 @@ import Alert from "@mui/material/Alert";
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
-
+import Placeholder from 'react-bootstrap/Placeholder';
 import FormControl from '@mui/material/FormControl';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
@@ -30,10 +30,11 @@ const Agenda = () => {
     const [emptyMeetingNumber, setemptyMeetingNumber] = useState(false);
     const [meetingCreated, setmeetingCreated] = useState(false);
     const [openModal, setopenModal] = useState(false);
+    const [loadingL, setLoadingL] = useState(true);
+
     const [openDeleteAgenda, setopenDeleteAgenda] = useState(false);
     const [openDeletePoint, setopenDeletePoint] = useState(false);
     
-
     const [emptyAnnoucement, setemptyAnnoucement] =useState(false)
     const [announcement, setannouncement] = useState()
 
@@ -105,6 +106,7 @@ const Agenda = () => {
 
 
     const getdata = async () => {
+        setLoadingL(true);
         const response = await getSenateMeetingAllAPI();
         const Meeting = response.body.results;
         const new_data = []
@@ -150,7 +152,7 @@ const Agenda = () => {
 
         console.log(new_data);
         setdata(new_data)
-
+        setLoadingL(false)
         console.log(new_data);
 
     }
@@ -237,13 +239,21 @@ const Agenda = () => {
 
             <div className="agenda-cont">
                 <div className="col-sm-3 agenda-menu left-pane">
-                    <button className="btn mb-3" data-target="create-agenda" onClick={() => setopenModal(true)}>Create New Agenda</button>
+                    <button className="btn btn-primary mb-3" data-target="create-agenda" onClick={() => setopenModal(true)}>Create New Agenda</button>
                     <h2>Agendas</h2>
                     <ul className="list-group">
                         {
-                            data?.map((val) => {
+                            !loadingL ? data?.map((val) => {
                                 return <li data-active={agenda === val.num} onClick={handleAgendaClick} className="list-item agenda clickable" data-target={"agenda_" + val.num}>{val.name}</li>
-                            })
+                            }) :
+                            <>
+                                <Placeholder as="p" animation="glow">
+                                    <Placeholder xs={12} />
+                                </Placeholder>
+                                <Placeholder as="p" animation="wave">
+                                    <Placeholder xs={12} />
+                                </Placeholder>
+                            </>
                         }
                     </ul>
                 </div>
@@ -299,7 +309,7 @@ const Agenda = () => {
 
 
 
-                <div className="col-sm-6 changes-data pt-5">
+                <div className="col-sm-6 right-pane changes-data">
                     {
                         NewPoint && (
                             <div className="ag_pt_new">
@@ -330,7 +340,11 @@ const Agenda = () => {
                                 <label for="ag_pt_view_prop" class="form-label">Proposal</label>
                                 <input readOnly={true} type="text" class="form-control" id="ag_pt_view_prop" placeholder={pointData.name} ></input>
                                 <input readOnly={true} type="text" class="form-control" id="ag_pt_view_prop" placeholder={pointData.proposal}></input>
-                                <button className="btn btn-danger" onClick={handleDeletePoint}>Delete Point</button>
+
+                                <div>
+                                    <button className="btn btn-danger" onClick={handleDeletePoint}>Delete Point</button>
+                                </div>
+
 
                             </form>
 

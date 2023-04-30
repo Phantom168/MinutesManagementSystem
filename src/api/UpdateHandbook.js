@@ -61,5 +61,26 @@ const updateHandbookPointAPI = async (id, number, senateMeeting, handbookPoint, 
 
 
 
+const getHandbookPointsAPI = async () => {
+    try {
+        const res = await fetch(`${API}handbook/handbookPoints/`, {
+            method: "GET",
+            // headers: {
+            //     'Authorization': token
+            // }
+        });
+        const response = {
+            status: res.status,
+            body: await res.json(),
+        };
 
-export {publishHandbookAPI, updateHandbookPointAPI}
+        return response;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+
+
+
+export {publishHandbookAPI, updateHandbookPointAPI, getHandbookPointsAPI}
