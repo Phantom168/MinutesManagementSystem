@@ -26,7 +26,6 @@ const UpdateHandbook = () => {
     const [point, setpoint] = useState(0);
     const [handbookSection, sethandbookSection] = useState();
     const [handbookPoint, sethandbookPoint] = useState();
-    const [handbookPointHTML, sethandbookPointHTML] = useState();
     
     const [HandbookData, setHandbookData] = useState();
     const [pointData, setpointData] = useState();
@@ -142,7 +141,6 @@ const handlePublish = async(e) => {
 
     const getPointDataHTML= async(handbookPoint) => {
         const res = await getHandbookPointsIdAPI(handbookPoint);
-        sethandbookPointHTML(res.body.text)
         seteditorState(EditorState.createWithContent(ContentState.createFromBlockArray(convertFromHTML(res.body.text))))
         
         console.log(res.body.text);
