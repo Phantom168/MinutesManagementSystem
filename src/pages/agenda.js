@@ -8,7 +8,7 @@ import {IoCreateOutline} from "react-icons/io5";
 import { getSenateMeetingAllAPI, getSenatePointsMeetingIdAPI, addSenateMeetingAPI, addSenatePointAPI } from '../api/senateMeeting'
 import 'bootstrap/dist/css/bootstrap.css';
 
-import { getSenateMeetingAllAPI, getSenatePointsMeetingIdAPI, addSenateMeetingAPI, addSenatePointAPI, deleteSenateAgendaAPI,  deleteSenatePointAPI} from '../api/senateMeeting'
+import { deleteSenateAgendaAPI,  deleteSenatePointAPI} from '../api/senateMeeting'
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import Box from '@mui/material/Box';
