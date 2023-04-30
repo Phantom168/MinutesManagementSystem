@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { getHandbookSectionAPI, getHandbookPointsSectionIdAPI, deleteHandbookSectionAPI } from '../api/handbook'
+import { getHandbookSectionAPI, getHandbookPointsSectionIdAPI, deleteHandbookSectionAPI,deleteHandbookPointAPI } from '../api/handbook'
 import { getSenatePointsIdAPI } from '../api/senateMeeting'
 import '../style.css';
 import Snackbar from "@mui/material/Snackbar";
@@ -28,7 +28,7 @@ export function AgendaTile(props) {
 class Home extends Component {
     constructor(props) {
         super(props);
-        this.state = { section: 0, point: 0, data: [], deleteSectionopen : false }
+        this.state = { section: 0, point: 0, data: [], deleteSectionopen : false, deletePointopen : false }
     }
 
 
@@ -102,6 +102,21 @@ class Home extends Component {
         })
     }
 
+    async handleDeletePoint(point, e){
+        console.log(point);
+        await deleteHandbookPointAPI(point);
+        this.setState({
+            point : 0
+        })
+
+        this.getData();
+        this.setState({
+            deletePointopen : true
+        })
+
+
+    }
+
     handleAgendaClick = (e) => {
         console.log(Number(e.target.dataset.target.split("_").slice(-1)))
         this.setState({
@@ -123,6 +138,12 @@ class Home extends Component {
         })
     }
 
+
+    setdeletePointopen = (open) => {
+        this.setState({
+            deletePointopen : open
+        })
+    }
     render() {
         return (
         
@@ -133,6 +154,13 @@ class Home extends Component {
 <Snackbar open={this.state.deleteSectionopen} autoHideDuration={6000} onClose={() => { this.setdeleteSectionopen(false); }}>
                 <Alert onClose={() => { this.setdeleteSectionopen(false); }} severity="success" sx={{ width: '100%' }}>
                    Senate Section Deleted!
+                </Alert>
+            </Snackbar>
+
+
+            <Snackbar open={this.state.deletePointopen} autoHideDuration={6000} onClose={() => { this.setdeletePointopen(false); }}>
+                <Alert onClose={() => { this.setdeletePointopen(false); }} severity="success" sx={{ width: '100%' }}>
+                   Senate Point Deleted!
                 </Alert>
             </Snackbar>
 
@@ -174,7 +202,7 @@ class Home extends Component {
                 {/* <pointHistory className="test">Hello</pointHistory> */}
                 {this.state.section !== 0 && this.state.point !== 0 && <React.Fragment>
                     <div className="btn-container">
-                        <button className="btn btn-danger">Delete Selected Point</button>
+                        <button className="btn btn-danger" onClick={(e) => this.handleDeletePoint(this.state.point, e)}>Delete Selected Point</button>
                     </div>
                     <h2>Version History</h2>
                 </React.Fragment>}
@@ -182,7 +210,7 @@ class Home extends Component {
                     return (
                         val.points?.map((pt) => {
                             return (
-                                this.state.section === val.num && this.state.point === pt.num &&
+                                this.state.section === val.num && this.state.point === pt.id &&
                                 pt.changes?.map((ch) => {
                                     return (
                                         <PointHistory when={ch.when} change={ch.change}></PointHistory>
@@ -194,7 +222,6 @@ class Home extends Component {
                 })}
 
             </div>
-            {console.log(this.state)}
         </div>);
     }
 }

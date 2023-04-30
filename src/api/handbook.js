@@ -40,6 +40,26 @@ const deleteHandbookSectionAPI = async (number) => {
 };
 
 
+const deleteHandbookPointAPI = async (number) => {
+    try {
+        const res = await fetch(`${API}handbook/handbookPoints/${number}/`, {
+            method: "DELETE",
+            // headers: {
+            //     'Authorization': token
+            // }
+        });
+        const response = {
+            status: res.status,
+            body: '',
+        };
+
+        return response;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+
 const getHandbookallPointsAPI = async () => {
     try {
         const res = await fetch(`${API}handbook/handbookPoints/`, {
@@ -78,6 +98,26 @@ const getHandbookPointsSectionIdAPI = async (sectionNumber) => {
     }
 };
 
+
+const getHandbookPointsIdAPI = async (id) => {
+    try {
+        const res = await fetch(`${API}handbook/handbookPoints/${id}`, {
+            method: "GET",
+
+        });
+        const response = {
+            status: res.status,
+            body: await res.json(),
+        };
+
+        return response;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+
+
 const addHandbookSectionAPI = async (handbookSection, text, number) => {
     try {
         const res = await fetch(`${API}handbook/handbookPoints`, {
@@ -87,7 +127,7 @@ const addHandbookSectionAPI = async (handbookSection, text, number) => {
                 Accept: "application/json",
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ "handbookSection": handbookSection, "text": text, "number" : number }),
+            body: JSON.stringify({ "handbookSection": handbookSection, "text": text, "number": number }),
         });
 
         //   create a map of the status and body of the response
@@ -106,4 +146,12 @@ const addHandbookSectionAPI = async (handbookSection, text, number) => {
 
 
 
-export {getHandbookSectionAPI ,deleteHandbookSectionAPI, getHandbookallPointsAPI,getHandbookPointsSectionIdAPI, addHandbookSectionAPI };
+export {
+    getHandbookSectionAPI,
+    deleteHandbookSectionAPI,
+    deleteHandbookPointAPI,
+    getHandbookallPointsAPI,
+    getHandbookPointsSectionIdAPI,
+    addHandbookSectionAPI,
+    getHandbookPointsIdAPI
+};

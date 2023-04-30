@@ -116,7 +116,7 @@ const addSenatePointAPI = async (number, name, proposal, senateMeeting) => {
     try {
         let FD = new FormData();
 
-        console.log("number", number, name,  proposal, senateMeeting)
+        console.log("number", number, name, proposal, senateMeeting)
         FD.append("number", number)
         FD.append("proposal", proposal)
         FD.append("name", name)
@@ -151,8 +151,8 @@ const putSenatePointAPI = async (id, number, senateMeeting, resolution, decision
         let FD = new FormData();
 
         FD.append("resolution", resolution)
-        FD.append("approved", decision-1)
-        FD.append("approvalComplete", 0)
+        FD.append("approved", decision - 1)
+        FD.append("approvalComplete", 1)
         FD.append("number", number)
         FD.append("senateMeeting", senateMeeting)
 
@@ -181,10 +181,53 @@ const putSenatePointAPI = async (id, number, senateMeeting, resolution, decision
 
 
 
+const deleteSenateAgendaAPI = async (number) => {
+    try {
+        const res = await fetch(`${API}senateMeeting/senateMeetings/${number}/`, {
+            method: "DELETE",
+            // headers: {
+            //     'Authorization': token
+            // }
+        });
+        const response = {
+            status: res.status,
+            body: '',
+        };
+
+        return response;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+const deleteSenatePointAPI = async (number) => {
+    try {
+        const res = await fetch(`${API}senateMeeting/senatePoints/${number}/`, {
+            method: "DELETE",
+            // headers: {
+            //     'Authorization': token
+            // }
+        });
+        const response = {
+            status: res.status,
+            body: '',
+        };
+
+        return response;
+    } catch (error) {
+        console.log(error);
+    }
+};
 
 
-
-
-
-
-export {getSenateMeetingAllAPI, getSenatePointsAllAPI, getSenatePointsIdAPI, getSenatePointsMeetingIdAPI, addSenateMeetingAPI, addSenatePointAPI, putSenatePointAPI};
+export {
+    getSenateMeetingAllAPI,
+    getSenatePointsAllAPI,
+    getSenatePointsIdAPI,
+    getSenatePointsMeetingIdAPI,
+    addSenateMeetingAPI,
+    addSenatePointAPI,
+    putSenatePointAPI,
+    deleteSenateAgendaAPI,
+    deleteSenatePointAPI
+};
