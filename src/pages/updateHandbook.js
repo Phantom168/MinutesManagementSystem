@@ -6,6 +6,7 @@ import { EditorState, convertToRaw, ContentState, convertFromHTML } from "draft-
 import draftToHtml from 'draftjs-to-html';
 import { getHandbookSectionAPI, getHandbookPointsSectionIdAPI, getHandbookPointsIdAPI } from '../api/handbook'
 import {publishHandbookAPI, updateHandbookPointAPI} from '../api/UpdateHandbook'
+import 'bootstrap/dist/css/bootstrap.css';
 
 import { getSenateMeetingAllAPI, getSenatePointsMeetingIdAPI } from '../api/senateMeeting'
 import Snackbar from "@mui/material/Snackbar";

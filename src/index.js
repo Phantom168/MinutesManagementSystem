@@ -14,6 +14,7 @@ import Agenda from "./pages/agenda";
 import SenateDecisions from "./pages/senateDecisions";
 import UpdateHandbook from "./pages/updateHandbook";
 
+import 'bootstrap/dist/css/bootstrap.css';
 
 import "./index.css";
 import App from "./App";

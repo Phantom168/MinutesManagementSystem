@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Collapsible from "react-collapsible";
+import 'bootstrap/dist/css/bootstrap.css';
 
 import { getSenateMeetingAllAPI, getSenatePointsMeetingIdAPI, addSenateMeetingAPI, addSenatePointAPI, deleteSenateAgendaAPI,  deleteSenatePointAPI} from '../api/senateMeeting'
 import Snackbar from "@mui/material/Snackbar";

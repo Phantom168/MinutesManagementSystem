@@ -4,6 +4,7 @@ import { getSenatePointsIdAPI } from '../api/senateMeeting'
 import '../style.css';
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
+import 'bootstrap/dist/css/bootstrap.css';
 var parse = require('html-react-parser');
 
 export function PointHistory(props) {
