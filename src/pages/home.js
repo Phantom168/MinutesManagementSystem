@@ -4,7 +4,10 @@ import { getSenatePointsIdAPI } from '../api/senateMeeting'
 import '../style.css';
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
+import Placeholder from 'react-bootstrap/Placeholder';
+import Card from 'react-bootstrap/Card';
 var parse = require('html-react-parser');
+
 
 export function PointHistory(props) {
     return (
@@ -28,14 +31,14 @@ export function AgendaTile(props) {
 class Home extends Component {
     constructor(props) {
         super(props);
-        this.state = { section: 0, point: 0, data: [], deleteSectionopen : false }
+        this.state = { section: 0, point: 0, data: [], deleteSectionopen : false, loadingL:true,LoadingM:true }
     }
 
 
     async getData() {
 
 
-
+        this.setState({loadingL:true})
         const response = await getHandbookSectionAPI();
         const section = response.body.results;
         const new_data = []
@@ -78,7 +81,8 @@ class Home extends Component {
         };
 
         this.setState({
-            data: new_data
+            data: new_data,
+            loadingL:false,
         }, this.forceUpdate())
 
 
@@ -141,9 +145,17 @@ class Home extends Component {
                 <h2>Handbook Sections</h2>
                 <ul className="list-group">
                     {
-                        this.state.data?.map((val) => {
+                        !this.state.loadingL ? this.state.data?.map((val) => {
                             return <li data-active={this.state.section === val.num} onClick={this.handleAgendaClick} className="list-item section clickable" data-target={"section_" + val.num}>{val.name}</li>
-                        })
+                        }) :
+                        <>
+                        <Placeholder as="p" animation="glow">
+                            <Placeholder xs={12} />
+                        </Placeholder>
+                        <Placeholder as="p" animation="wave">
+                            <Placeholder xs={12} />
+                        </Placeholder>
+                        </>
                     }
                 </ul>
             </div>
@@ -170,7 +182,8 @@ class Home extends Component {
 
             </div>
 
-            <div className="col-sm-6 home-right-pane changes-data">
+            <div className="col-sm-6 right-pane changes-data">
+                <div>
                 {/* <pointHistory className="test">Hello</pointHistory> */}
                 {this.state.section !== 0 && this.state.point !== 0 && <React.Fragment>
                     <div className="btn-container">
@@ -192,7 +205,7 @@ class Home extends Component {
                         })
                     )
                 })}
-
+                </div>
             </div>
             {console.log(this.state)}
         </div>);

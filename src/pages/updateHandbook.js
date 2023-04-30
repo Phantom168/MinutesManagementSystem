@@ -19,6 +19,7 @@ import FormControl from '@mui/material/FormControl';
 import TextField from '@mui/material/TextField';
 import Select from '@mui/material/Select';
 import jsPDF from 'jspdf';
+import Placeholder from 'react-bootstrap/Placeholder';
 import ReactToPrint, {useReactToPrint } from "react-to-print";
 var parse = require('html-react-parser');
 
@@ -95,6 +96,7 @@ const UpdateHandbook = () => {
     const [HandbooknewText, setHandbooknewText] = useState(false);
     const [show, setShow] = useState(false)
     const pdfRef = useRef(null);
+    const [loadingL, setLoadingL] = useState(true);
 
 const handleSubmit = async(e) => {
     e.preventDefault();
@@ -137,6 +139,7 @@ const handlePublish = async(e) => {
 
 
     const getdata = async () => {
+        setLoadingL(true);
         const response = await getSenateMeetingAllAPI();
         const Meeting = response.body.results;
         const new_data = []
@@ -190,6 +193,7 @@ const handlePublish = async(e) => {
 
         console.log("newhandbookData", newhandbookData)
         setdata(new_data);
+        setLoadingL(false)
         setHandbookData(newhandbookData)
 
         
@@ -292,9 +296,17 @@ const handlePublish = async(e) => {
                     <h2>Senate Decisions</h2>
                     <ul className="list-group">
                         {
-                            data?.map((val) => {
+                            !loadingL ? data?.map((val) => {
                                 return <li data-active={agenda === val.num} onClick={handleAgendaClick} className="list-item agenda clickable" data-target={"agenda_" + val.num}>{val.name}</li>
-                            })
+                            }) :
+                            <>
+                                <Placeholder as="p" animation="glow">
+                                    <Placeholder xs={12} />
+                                </Placeholder>
+                                <Placeholder as="p" animation="wave">
+                                    <Placeholder xs={12} />
+                                </Placeholder>
+                            </>
                         }
                     </ul>
                 </div>
@@ -348,7 +360,7 @@ const handlePublish = async(e) => {
 
 
 
-                <div className="col-sm-6 changes-data pt-5">
+                <div className="col-sm-6 changes-data right-pane">
                 
                     {
                         (point === 0 ? (agenda === 0 ?

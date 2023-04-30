@@ -5,6 +5,7 @@ import { getSenateMeetingAllAPI, getSenatePointsMeetingIdAPI, putSenatePointAPI}
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import InputLabel from '@mui/material/InputLabel';
+import Placeholder from 'react-bootstrap/Placeholder';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 
@@ -19,7 +20,7 @@ const SenateDecisions = () => {
     const [pointData, setpointData] = useState();
     const [resolution, setResolution] = useState();
     const [Decision, setDecision] = useState();
-
+    const [loadingL, setLoadingL] = useState(true);
     const [emptyDecision, setemptyDecision] = useState(false);
     const [emptyResolution, setemptyResolution] = useState(false);
     const [DecisionDone, setDecisionDone] = useState(false);
@@ -60,6 +61,7 @@ const SenateDecisions = () => {
 
 
     const getdata = async () => {
+        setLoadingL(true)
         const response = await getSenateMeetingAllAPI();
         const Meeting = response.body.results;
         const new_data = []
@@ -90,6 +92,7 @@ const SenateDecisions = () => {
         };
 
         console.log(new_data);
+        setLoadingL(false)
         setdata(new_data)
 
     }
@@ -126,9 +129,17 @@ const SenateDecisions = () => {
                     <h2>Agendas</h2>
                     <ul className="list-group">
                         {
-                            data?.map((val) => {
+                            !loadingL ? data?.map((val) => {
                                 return <li data-active={agenda === val.num} onClick={handleAgendaClick} className="list-item agenda clickable" data-target={"agenda_" + val.num}>{val.name}</li>
-                            })
+                            }) :
+                            <>
+                                <Placeholder as="p" animation="glow">
+                                    <Placeholder xs={12} />
+                                </Placeholder>
+                                <Placeholder as="p" animation="wave">
+                                    <Placeholder xs={12} />
+                                </Placeholder>
+                            </>
                         }
                     </ul>
                 </div>
@@ -182,7 +193,7 @@ const SenateDecisions = () => {
 
 
 
-                <div className="col-sm-6 changes-data pt-5">
+                <div className="col-sm-6 changes-data right-pane">
 
                     {
                         (point === 0 ? (agenda === 0 ?
@@ -238,7 +249,9 @@ const SenateDecisions = () => {
 
                                 
 
-                                <button className="btn btn-success" onClick={handleSubmit}>Submit</button>
+                                <div>
+                                    <button className="btn btn-success" onClick={handleSubmit}>Submit</button>
+                                </div>
                             </form>
 
                             
